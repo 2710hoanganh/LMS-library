@@ -33,6 +33,7 @@ namespace LMS_library.Controllers
                 return BadRequest("User already exists .");
             }
 
+            //hash password
             HashPassword(request.password
                 ,out byte[] passswordHash 
                 ,out byte[] passwordSalt);
@@ -70,7 +71,7 @@ namespace LMS_library.Controllers
 
         }
 
-
+        //function create token use in Login
         private string CreateToken(User user) 
         {
             List<Claim> claims = new List<Claim>
@@ -91,6 +92,8 @@ namespace LMS_library.Controllers
             return jwt;
         }
         
+
+        //Hash password function 
         private void HashPassword(string password , out byte[] passswordHash, out byte[] passwordSalt)
         {
             using (var hmac = new HMACSHA512())
@@ -101,6 +104,9 @@ namespace LMS_library.Controllers
             }
         }
 
+
+
+        //verify hash password when login 
         private bool VerifyHashPassword(string password, byte[] passswordHash,  byte[] passwordSalt)
         {
             using (var hmac = new HMACSHA512(passwordSalt))
