@@ -16,8 +16,23 @@ namespace LMS_library.Controllers
             _contex = contex;
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetAllUser()
+        {
+
+            try
+            {
+                return Ok(await _repository.GetAll());
+            }
+            catch
+            {
+                return BadRequest();
+            }
+
+        }
+
         [HttpGet("{id}")]
-        public async Task<IActionResult> Get(int id)
+        public async Task<IActionResult> GetUser(int id)
         {
             
             var user = await _repository.GetById(id);
