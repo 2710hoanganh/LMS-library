@@ -16,7 +16,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(typeof(Program));
 
-// life cycle DL : AddSingleton(),AddTransient(),AddScoped()
+// life cycle DL : AddSingleton(),AddTransient(),AddScoped() 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 
