@@ -2,6 +2,7 @@
 
 namespace LMS_library.Models
 {
+
     public class UserRegisterRequest
     {
         [Required,EmailAddress]
