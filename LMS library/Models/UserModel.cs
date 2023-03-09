@@ -6,9 +6,11 @@ namespace LMS_library.Models
     {
         [Key]
         public int id { get; set; }
-        [Required]
+        [Required,EmailAddress]
         public string email { get; set; } = string.Empty;
-        public byte[] passwordHash { get; set; } = new byte[32];
-        public byte[] passwordSalt { get; set; } = new byte[32];
+        [Required, MinLength(6, ErrorMessage = "Please enter at least 6 character"), MaxLength(25)]
+        public string password { get; set; } = string.Empty;
+        [Required, Compare("password")]
+        public string confirmPassword { get; set; } = string.Empty;
     }
 }

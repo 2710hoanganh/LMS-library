@@ -1,5 +1,8 @@
 ﻿using AutoMapper;
+using Azure.Core;
+using LMS_library.Data;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Cryptography;
 
 namespace LMS_library.Repositories
 {
@@ -14,12 +17,23 @@ namespace LMS_library.Repositories
             _mapper = mapper;
         }
 
-        public async Task<int> AddUserAsync(UserModel model)
+        public async Task<string> AddUserAsync(UserModel model)
         {
-            var newUser = _mapper.Map<User>(model); 
+            HashPassword(model.password
+              , out byte[] passswordHash
+              , out byte[] passwordSalt);
+            var user = new User
+            {
+                email = model.email,
+                passwordHash = passswordHash,
+                passwordSalt = passwordSalt
+
+            };
+            var newUser = _mapper.Map<User>(user);
+
             _contex.Users.Add(newUser);
             await _contex.SaveChangesAsync();
-            return newUser.id;
+            return ($"{newUser.email} create successfully .");
 
         }
 
@@ -33,12 +47,11 @@ namespace LMS_library.Repositories
             }
         }
 
-        public async Task<List<UserModel>> GetAll()
+        public async Task<List<User>> GetAll()
         {
             var user = await _contex.Users!.ToListAsync();
-            return  _mapper.Map<List<UserModel>>(user);
-            
-            
+            return  _mapper.Map<List<User>>(user);
+           
         }
 
         public async Task<UserModel> GetById(int id)
@@ -47,13 +60,27 @@ namespace LMS_library.Repositories
             return _mapper.Map<UserModel>(user);
         }
 
-        async Task IUserRepository.UpdateUserAsync(int id, UserModel model)
+        public async Task UpdateUserAsync(int id, UserModel model)
         {
             if(id == model.id)
             {
                 var updateUser = _mapper.Map<User>(model);
                 _contex.Users?.Update(updateUser);
                 await _contex.SaveChangesAsync();
+            }
+        }
+
+
+
+
+        //Hash password function 
+        private void HashPassword(string password, out byte[] passswordHash, out byte[] passwordSalt)
+        {
+            using (var hmac = new HMACSHA512())
+            {
+                passwordSalt = hmac.Key;
+                passswordHash = hmac
+                    .ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
             }
         }
     }
