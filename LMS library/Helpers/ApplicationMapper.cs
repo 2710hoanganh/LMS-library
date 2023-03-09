@@ -7,7 +7,8 @@ namespace LMS_library.Helpers
 
         public ApplicationMapper() 
         {
-            CreateMap<User,UserModel>().ReverseMap(); 
+            CreateMap<User,UserModel>().ReverseMap();
+            CreateMap<Role, RoleModel>().ReverseMap();
         }
     }
 }

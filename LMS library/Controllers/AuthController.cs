@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
+using System.Text;
 
 namespace LMS_library.Controllers
 {
@@ -50,6 +52,7 @@ namespace LMS_library.Controllers
             return Ok( "User create successfully !");
 
         }
+
         [HttpPost("login")]
         public async Task<IActionResult> Login(UserLoginRequest request)
         {
@@ -71,6 +74,15 @@ namespace LMS_library.Controllers
 
         }
 
+        [Authorize]
+        [HttpPost("Logout")]
+        public ActionResult Logout()
+        {
+            
+
+            return Ok();
+        }
+
         //function create token use in Login
         private string CreateToken(User user) 
         {
@@ -79,7 +91,7 @@ namespace LMS_library.Controllers
                 new Claim(ClaimTypes.Email, user.email),
             };
 
-            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_configuration["JsonWebTokenKeys:IssuerSigningKey"]));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JsonWebTokenKeys:IssuerSigningKey"]));
 
             var cred = new SigningCredentials(key , SecurityAlgorithms.HmacSha512Signature );
 
@@ -91,6 +103,8 @@ namespace LMS_library.Controllers
 
             return jwt;
         }
+
+
         
 
         //Hash password function 

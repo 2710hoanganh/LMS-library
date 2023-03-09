@@ -1,5 +1,6 @@
 ﻿using Azure.Core;
 using LMS_library.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Cryptography;
@@ -8,6 +9,7 @@ namespace LMS_library.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+
     public class UsersController : ControllerBase
     {
         private readonly IUserRepository _repository;
@@ -17,6 +19,7 @@ namespace LMS_library.Controllers
             _repository = repository;
             _contex = contex;
         }
+
 
         [HttpGet]
         public async Task<IActionResult> GetAllUser()
@@ -30,6 +33,7 @@ namespace LMS_library.Controllers
                 return BadRequest();
             }
         }
+
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetUser(int id)
@@ -51,7 +55,7 @@ namespace LMS_library.Controllers
             return Ok(newUser);
         }
 
-
+ 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser([FromRoute]int id)
         {
@@ -60,21 +64,6 @@ namespace LMS_library.Controllers
             return Ok("Delete Success !");
 
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        //chua lam update nha
     }
 }
