@@ -47,7 +47,6 @@ namespace LMS_library.Controllers
             {
                 return BadRequest("User already exists .");
             }
-
             var newUser = await _repository.AddUserAsync(model);    
             return Ok(newUser);
         }
