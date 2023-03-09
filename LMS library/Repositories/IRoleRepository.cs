@@ -9,5 +9,6 @@ namespace LMS_library.Repositories
         public Task<string> AddRoleAsync(RoleModel model);
         public Task UpdateRoleAsync(int id, RoleModel model);
         public Task DeleteRoleAsync(int id);
+
     }
 }
