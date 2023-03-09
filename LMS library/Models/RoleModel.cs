@@ -4,6 +4,7 @@ namespace LMS_library.Models
 {
     public class RoleModel
     {
+
         [Key]
         public int id { get; set; }
         [Required]
