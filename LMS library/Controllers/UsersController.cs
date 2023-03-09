@@ -36,7 +36,7 @@ namespace LMS_library.Controllers
         {
             
             var user = await _repository.GetById(id);
-            return user == null ? NotFound() : Ok(user);
+            return user == null ? NotFound() : Ok(user.email);
            
         }
 
@@ -52,6 +52,14 @@ namespace LMS_library.Controllers
         }
 
 
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteUser([FromRoute]int id)
+        {
+
+            await _repository.DeleteUserAsync(id);
+            return Ok("Delete Success !");
+
+        }
 
 
 
@@ -65,6 +73,8 @@ namespace LMS_library.Controllers
 
 
 
-   
+
+
+
     }
 }
