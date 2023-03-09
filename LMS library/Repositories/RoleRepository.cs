@@ -5,6 +5,7 @@ namespace LMS_library.Repositories
 {
     public class RoleRepository : IRoleRepository
     {
+
         private readonly IMapper _mapper;
         private readonly DataDBContex _contex;
 
