@@ -4,6 +4,7 @@ namespace LMS_library.Data
 {
     public class Role
     {
+
         [Key]
         public int id { get; set; }
         [Required]
