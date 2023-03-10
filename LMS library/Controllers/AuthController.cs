@@ -16,8 +16,8 @@ namespace LMS_library.Controllers
     {
        
 
-        private DataDBContex _contex;
-        private readonly IConfiguration _configuration;
+        private readonly DataDBContex _contex;
+        private  IConfiguration _configuration;
 
    
         public AuthController(DataDBContex contex , IConfiguration configuration)
@@ -44,7 +44,8 @@ namespace LMS_library.Controllers
             {
                 email = request.email,
                 passwordHash = passswordHash,
-                passwordSalt = passwordSalt
+                passwordSalt = passwordSalt,
+                role = request.role,
 
             };
              _contex.Users.Add(user);
@@ -68,7 +69,7 @@ namespace LMS_library.Controllers
             string token = CreateToken(user);
 
 
-            return Ok($"Wellcome back {user.email} , Token : {token}") ;
+            return Ok(token) ;
 
 
 
@@ -89,13 +90,18 @@ namespace LMS_library.Controllers
             List<Claim> claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Email, user.email),
+                new Claim(ClaimTypes.Role, user.role),
+                new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
+                new Claim(JwtRegisteredClaimNames.Iat,DateTime.UtcNow.ToString()),
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JsonWebTokenKeys:IssuerSigningKey"]));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JsonWebTokenKeys:Key"]));
 
-            var cred = new SigningCredentials(key , SecurityAlgorithms.HmacSha512Signature );
+            var cred = new SigningCredentials(key , SecurityAlgorithms.HmacSha256 );
 
             var token = new JwtSecurityToken(
+                issuer: _configuration["JsonWebTokenKeys:Issuer"],
+                audience: _configuration["JsonWebTokenKeys:Audience"],
                 claims:claims,
                 expires:DateTime.Now.AddDays(1),
                 signingCredentials:cred);

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace LMS_library.Models
 {
@@ -11,5 +12,7 @@ namespace LMS_library.Models
         public string password { get; set; } = string.Empty;
         [Required ,Compare("password")]
         public string confirmPassword { get; set; } = string.Empty;
+        [DefaultValue("Student")]
+        public string role { get; set; } = string.Empty;
     }
 }

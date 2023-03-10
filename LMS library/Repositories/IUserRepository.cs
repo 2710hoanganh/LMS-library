@@ -5,7 +5,7 @@ namespace LMS_library.Repositories
     public interface IUserRepository
     {
         public Task<List<User>> GetAll();
-        public Task<UserModel> GetById(int id);
+        public Task<User> GetById(int id);
         public Task<string> AddUserAsync(UserModel model);
         public Task UpdateUserAsync(int id ,UserModel model);
         public Task DeleteUserAsync(int id);

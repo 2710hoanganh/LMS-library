@@ -25,8 +25,11 @@ namespace LMS_library.Repositories
             var user = new User
             {
                 email = model.email,
+                firstName= model.firstName,
+                lastName= model.lastName,
                 passwordHash = passswordHash,
-                passwordSalt = passwordSalt
+                passwordSalt = passwordSalt,
+                role= model.role,
 
             };
             var newUser = _mapper.Map<User>(user);
@@ -54,10 +57,10 @@ namespace LMS_library.Repositories
            
         }
 
-        public async Task<UserModel> GetById(int id)
+        public async Task<User> GetById(int id)
         {
             var user = await _contex.Users!.FindAsync(id);
-            return _mapper.Map<UserModel>(user);
+            return _mapper.Map<User>(user);
         }
 
         public async Task UpdateUserAsync(int id, UserModel model)

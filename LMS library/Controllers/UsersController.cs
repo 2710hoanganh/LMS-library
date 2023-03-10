@@ -9,6 +9,7 @@ namespace LMS_library.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
 
     public class UsersController : ControllerBase
     {
@@ -40,7 +41,7 @@ namespace LMS_library.Controllers
         {
             
             var user = await _repository.GetById(id);
-            return user == null ? NotFound() : Ok(user.email);
+            return user == null ? NotFound() : Ok(user);
            
         }
 
