@@ -20,6 +20,7 @@ namespace LMS_library.Controllers
 
 
         [HttpGet]
+        [Authorize(Roles="Admin")]
         public async Task<IActionResult> GetAllRole()
         {
             try

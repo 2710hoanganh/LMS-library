@@ -9,7 +9,7 @@ namespace LMS_library.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize(Roles = "Admin")]
 
     public class UsersController : ControllerBase
     {
