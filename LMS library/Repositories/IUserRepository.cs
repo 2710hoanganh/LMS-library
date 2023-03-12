@@ -7,7 +7,6 @@ namespace LMS_library.Repositories
         public Task<List<User>> GetAll();
         public Task<User> GetById(int id);
         public Task<string> AddUserAsync(UserModel model);
-        public Task UpdateUserAsync(int id ,UserModel model);
         public Task DeleteUserAsync(int id);
     }
 }

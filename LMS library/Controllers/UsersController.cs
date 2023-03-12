@@ -71,6 +71,7 @@ namespace LMS_library.Controllers
         }
 
         [HttpPut("update/{id}")]
+        [Authorize(Roles = "Admin,Teacher,Student,LeaderShip")]
         public async Task<IActionResult> UpdateUser(int id,[FromBody]UserEditModel model)
         {
             try

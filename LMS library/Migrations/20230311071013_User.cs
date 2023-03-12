@@ -19,8 +19,8 @@ namespace LMS_library.Migrations
                     email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     firstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     lastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    passwordHash = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
-                    passwordSalt = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
+                    passwordHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    passwordSalt = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     role = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>

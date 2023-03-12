@@ -12,8 +12,8 @@ namespace LMS_library.Data
         public string firstName { get; set; } = string.Empty;
         public string lastName { get; set; } = string.Empty;
 
-        public byte[] passwordHash { get; set; } = new byte[32];
-        public byte[] passwordSalt { get; set; } = new byte[32];
+        public string passwordHash { get; set; } = string.Empty;
+        public string passwordSalt { get; set; } = string.Empty;
   
         public string role { get; set; } = string.Empty;
 

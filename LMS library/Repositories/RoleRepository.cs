@@ -18,7 +18,7 @@ namespace LMS_library.Repositories
         public async Task<string> AddRoleAsync(RoleModel model)
         {
             var newRole = _mapper.Map<Role>(model);
-
+            newRole.create_At= DateTime.Now;    
             _contex.Roles.Add(newRole);
             await _contex.SaveChangesAsync();
             return ("create successfully .");
@@ -50,7 +50,11 @@ namespace LMS_library.Repositories
         {
             if (id == model.id)
             {
-                var updateRole = _mapper.Map<Role>(model);
+                var role = await _contex.Roles!.FindAsync(model.id);
+                role.name = model.name;
+                role.create_At = role.create_At;
+                role.update_At = model.update_At;
+                var updateRole = _mapper.Map<Role>(role);
                 _contex.Roles?.Update(updateRole);
                 await _contex.SaveChangesAsync();
             }

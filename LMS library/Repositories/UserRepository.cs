@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using Azure.Core;
 using LMS_library.Data;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Cryptography;
+using System.Text;
 
 namespace LMS_library.Repositories
 {
@@ -27,8 +29,8 @@ namespace LMS_library.Repositories
                 email = model.email,
                 firstName= model.firstName,
                 lastName= model.lastName,
-                passwordHash = passswordHash,
-                passwordSalt = passwordSalt,
+                passwordHash = Convert.ToHexString(passswordHash),
+                passwordSalt = Convert.ToHexString(passwordSalt),
                 role= model.role,
 
             };
@@ -56,25 +58,11 @@ namespace LMS_library.Repositories
             return  _mapper.Map<List<User>>(user);
            
         }
-
         public async Task<User> GetById(int id)
         {
             var user = await _contex.Users!.FindAsync(id);
             return _mapper.Map<User>(user);
         }
-
-        public async Task UpdateUserAsync(int id, UserModel model)
-        {
-            if(id == model.id)
-            {
-                var updateUser = _mapper.Map<User>(model);
-                _contex.Users?.Update(updateUser);
-                await _contex.SaveChangesAsync();
-            }
-        }
-
-
-
 
         //Hash password function 
         private void HashPassword(string password, out byte[] passswordHash, out byte[] passwordSalt)

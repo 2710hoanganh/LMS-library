@@ -43,14 +43,18 @@ namespace LMS_library.Controllers
             var user = new User
             {
                 email = request.email,
-                passwordHash = passswordHash,
-                passwordSalt = passwordSalt,
+                passwordHash = Convert.ToHexString(passswordHash),
+                passwordSalt = Convert.ToHexString(passwordSalt),
                 role = request.role,
 
             };
              _contex.Users.Add(user);
             await _contex.SaveChangesAsync();
-            return Ok( "User create successfully !");
+            return Ok(new
+            {
+                user.passwordHash,
+                user.passwordSalt
+            });
 
         }
 
@@ -62,7 +66,7 @@ namespace LMS_library.Controllers
             {
                 return BadRequest("User not existing");
             }
-            if (!VerifyHashPassword(request.password, user.passwordHash, user.passwordSalt))
+            if (!VerifyHashPassword(request.password, Convert.FromHexString(user.passwordHash), Convert.FromHexString(user.passwordSalt)))
             {
                 return BadRequest("Password not correct");
             }
@@ -120,19 +124,19 @@ namespace LMS_library.Controllers
             {
                 passwordSalt = hmac.Key;
                 passswordHash = hmac
-                    .ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+                    .ComputeHash(Encoding.UTF8.GetBytes(password));
             }
         }
 
 
 
         //verify hash password when login 
-        private bool VerifyHashPassword(string password, byte[] passswordHash,  byte[] passwordSalt)
+        private bool VerifyHashPassword(string password, byte[] passswordHash, byte[] passwordSalt)
         {
             using (var hmac = new HMACSHA512(passwordSalt))
             {
                 var computedHash = hmac
-                    .ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+                    .ComputeHash(Encoding.UTF8.GetBytes(password));
                 return computedHash.SequenceEqual(passswordHash);
             }
         }

@@ -7,7 +7,7 @@ namespace LMS_library.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize(Roles = "Admin,LeaderShip")]
     public class RoleController : ControllerBase
     {
         private readonly IRoleRepository _repository;
@@ -19,8 +19,7 @@ namespace LMS_library.Controllers
         }
 
 
-        [HttpGet]
-        [Authorize(Roles="Admin")]
+        [HttpGet("list")]
         public async Task<IActionResult> GetAllRole()
         {
             try
@@ -37,28 +36,58 @@ namespace LMS_library.Controllers
         public async Task<IActionResult> GetRole(int id)
         {
 
-            var role = await _repository.GetById(id);
-            return role == null ? NotFound() : Ok(role);
+            try
+            {
+                var role = await _repository.GetById(id);
+                return role == null ? NotFound() : Ok(role);
+            }
+            catch { return BadRequest(); }
 
         }
 
         [HttpPost("add-role")]
-        public async Task<IActionResult> AddNewUser(RoleModel model)
+        public async Task<IActionResult> AddNewRole(RoleModel model)
         {
-            if (_contex.Roles.Any(r => r.name == model.name))
+            try
             {
-                return BadRequest("Role already exists .");
+                if (_contex.Roles.Any(r => r.name == model.name))
+                {
+                    return BadRequest("Role already exists .");
+                }
+                var newRole = await _repository.AddRoleAsync(model);
+                return Ok(newRole);
             }
-            var newRole = await _repository.AddRoleAsync(model);
-            return Ok(newRole);
+            catch { return BadRequest(); }
         }
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser([FromRoute] int id)
+        [HttpDelete("delete/{id}")]
+        public async Task<IActionResult> DeleteRole([FromRoute] int id)
         {
 
-            await _repository.DeleteRoleAsync(id);
-            return Ok("Delete Success !");
+            try
+            {
+                await _repository.DeleteRoleAsync(id);
+                return Ok("Delete Success !");
+            }
+            catch { return BadRequest(); }  
 
+        }
+
+        [HttpPut("update/{id}")]
+        public async Task<IActionResult> UpdateRole(int id , [FromBody] RoleModel model)
+        {
+            try
+            {
+                if(model.id != id)
+                {
+                    return NotFound();  
+                }
+                await _repository.UpdateRoleAsync(id, model);
+                return Ok("Update Successfully");
+            }
+            catch
+            {
+                return BadRequest();
+            }
         }
         //chua lam update nha
     }

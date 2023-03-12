@@ -65,13 +65,13 @@ namespace LMS_library.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<byte[]>("passwordHash")
+                    b.Property<string>("passwordHash")
                         .IsRequired()
-                        .HasColumnType("varbinary(max)");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<byte[]>("passwordSalt")
+                    b.Property<string>("passwordSalt")
                         .IsRequired()
-                        .HasColumnType("varbinary(max)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("role")
                         .IsRequired()

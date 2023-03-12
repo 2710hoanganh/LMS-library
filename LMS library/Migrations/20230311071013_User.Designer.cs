@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LMS_library.Migrations
 {
     [DbContext(typeof(DataDBContex))]
-    [Migration("20230310062436_User")]
+    [Migration("20230311071013_User")]
     partial class User
     {
         /// <inheritdoc />
@@ -68,13 +68,13 @@ namespace LMS_library.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<byte[]>("passwordHash")
+                    b.Property<string>("passwordHash")
                         .IsRequired()
-                        .HasColumnType("varbinary(max)");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<byte[]>("passwordSalt")
+                    b.Property<string>("passwordSalt")
                         .IsRequired()
-                        .HasColumnType("varbinary(max)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("role")
                         .IsRequired()

@@ -48,6 +48,8 @@ builder.Services.AddAutoMapper(typeof(Program));
 // life cycle DL : AddSingleton(),AddTransient(),AddScoped() 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+builder.Services.AddScoped<IUserEditRepository, UserEditRepository>();
+builder.Services.AddScoped<IPasswordRepository, PasswordRepository>();
 
 
 //Jwt Token Functionality
