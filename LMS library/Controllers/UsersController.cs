@@ -14,15 +14,19 @@ namespace LMS_library.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUserRepository _repository;
+        private readonly IUserEditRepository _userEditRepository;
+        private readonly IPasswordRepository _passwordRepository;
         private readonly DataDBContex _contex;
-        public UsersController(IUserRepository repository,DataDBContex contex)
+        public UsersController(IUserRepository repository,DataDBContex contex, IUserEditRepository userEditRepository,IPasswordRepository passwordRepository)
         {
             _repository = repository;
             _contex = contex;
+            _userEditRepository = userEditRepository;
+            _passwordRepository = passwordRepository;
         }
 
 
-        [HttpGet]
+        [HttpGet("list")]
         public async Task<IActionResult> GetAllUser()
         {
             try
@@ -57,7 +61,7 @@ namespace LMS_library.Controllers
         }
 
  
-        [HttpDelete("{id}")]
+        [HttpDelete("delete/{id}")]
         public async Task<IActionResult> DeleteUser([FromRoute]int id)
         {
 
@@ -65,6 +69,43 @@ namespace LMS_library.Controllers
             return Ok("Delete Success !");
 
         }
-        //chua lam update nha
+
+        [HttpPut("update/{id}")]
+        public async Task<IActionResult> UpdateUser(int id,[FromBody]UserEditModel model)
+        {
+            try
+            {
+                if (model.id != id)
+                {
+                    return NotFound();
+                }
+                await _userEditRepository.UpdateUserAsync(id, model);
+                return Ok("Update Successfully");
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+        
+        [HttpPut("password-setting/{id}")]
+        [Authorize(Roles ="Admin,Teacher,Student,LeaderShip")]
+        public async Task<IActionResult> ChangePassword(int id, [FromBody] Password model)
+        {
+            try
+            {
+                if (model.id != id)
+                {
+                    return NotFound();
+                }
+                await _passwordRepository.ChangePassword(id, model);
+                return Ok("Update Successfully");
+            }
+            catch
+            {
+                return BadRequest("Current Password Incorrect !");
+            }
+        }
+
     }
 }
