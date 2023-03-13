@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -21,7 +22,9 @@ namespace LMS_library.Migrations
                     lastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     passwordHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     passwordSalt = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    role = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    role = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    resetToken = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    resetTokenExpires = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {

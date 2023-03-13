@@ -17,6 +17,9 @@ namespace LMS_library.Data
   
         public string role { get; set; } = string.Empty;
 
+        public string? resetToken { get; set; }  
+        public DateTime? resetTokenExpires { get; set; } 
+
         
 
 

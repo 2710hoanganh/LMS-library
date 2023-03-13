@@ -73,6 +73,12 @@ namespace LMS_library.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("resetToken")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("resetTokenExpires")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("role")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
