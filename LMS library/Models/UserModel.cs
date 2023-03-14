@@ -7,6 +7,8 @@ namespace LMS_library.Models
     {
         [Key]
         public int id { get; set; }
+        [Required]
+        public string userCode { get; set; }
         [Required,EmailAddress]
         public string email { get; set; } = string.Empty;
         [DefaultValue("First Name")]
@@ -18,6 +20,6 @@ namespace LMS_library.Models
         [Required, Compare("password")]
         public string confirmPassword { get; set; } = string.Empty;
         [DefaultValue("Student")]
-        public string role { get; set; } = string.Empty;
+        public string role { get; set; } =string.Empty;
     }
 }

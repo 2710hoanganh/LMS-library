@@ -6,6 +6,8 @@ namespace LMS_library.Models
 
     public class UserRegisterRequest
     {
+        [Required]
+        public string userCode { get; set; } = string.Empty;
         [Required,EmailAddress]
         public string email { get; set; } = string.Empty;
         [Required,MinLength(6,ErrorMessage = "Please enter at least 6 character") ,MaxLength(25)]

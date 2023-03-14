@@ -9,7 +9,7 @@ namespace LMS_library.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
+  
 
     public class UsersController : ControllerBase
     {
@@ -27,6 +27,7 @@ namespace LMS_library.Controllers
 
 
         [HttpGet("list")]
+        [Authorize(Roles = "Admin,Leader")]
         public async Task<IActionResult> GetAllUser()
         {
             try
@@ -41,6 +42,7 @@ namespace LMS_library.Controllers
 
 
         [HttpGet("{id}")]
+        [Authorize(Roles = "Admin,Leader")]
         public async Task<IActionResult> GetUser(int id)
         {
             
@@ -50,6 +52,7 @@ namespace LMS_library.Controllers
         }
 
         [HttpPost("add-user")]
+        [Authorize(Roles = "Admin,Leader")]
         public async Task<IActionResult> AddNewUser(UserModel model)
         {
             if(_contex.Users.Any(u=>u.email== model.email))
@@ -62,6 +65,7 @@ namespace LMS_library.Controllers
 
  
         [HttpDelete("delete/{id}")]
+        [Authorize(Roles = "Admin,Leader")]
         public async Task<IActionResult> DeleteUser([FromRoute]int id)
         {
 
@@ -71,7 +75,7 @@ namespace LMS_library.Controllers
         }
 
         [HttpPut("update/{id}")]
-        [Authorize(Roles = "Admin,Teacher,Student,LeaderShip")]
+        [Authorize(Roles = "Admin,Teacher,Student,Leader")]
         public async Task<IActionResult> UpdateUser(int id,[FromBody]UserEditModel model)
         {
             try
@@ -90,7 +94,7 @@ namespace LMS_library.Controllers
         }
         
         [HttpPut("password-setting/{id}")]
-        [Authorize(Roles ="Admin,Teacher,Student,LeaderShip")]
+        [Authorize(Roles ="Admin,Teacher,Student,Leader")]
         public async Task<IActionResult> ChangePassword(int id, [FromBody] Password model)
         {
             try

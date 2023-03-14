@@ -20,5 +20,7 @@
         public DbSet<User> Users {get; set;}
         public DbSet<Role> Roles { get; set; }
 
+        public DbSet<System> Systems { get; set; }
+        public DbSet<SystemDetail> SystemsDetail { get; set; }
     }
 }

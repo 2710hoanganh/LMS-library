@@ -22,16 +22,21 @@ namespace LMS_library.Repositories
         {
             if (id == model.id)
             {
+                var roleId = await _contex.Roles.FirstOrDefaultAsync(r => r.name == model.role);
                 var user = await _contex.Users!.FindAsync(model.id);
-                user.email = model.email;
-                user.firstName = model.firstName;
-                user.lastName = model.lastName;
-                user.passwordHash = user.passwordHash;
-                user.passwordSalt = user.passwordSalt;
-                user.role = model.role;
-                var updateUser = _mapper.Map<User>(user);
-                _contex.Users?.Update(updateUser);
-                await _contex.SaveChangesAsync();
+                if(user != null||roleId != null)
+                {
+                    user.userCode = model.userCode;
+                    user.email = model.email;
+                    user.firstName = model.firstName;
+                    user.lastName = model.lastName;
+                    user.passwordHash = user.passwordHash;
+                    user.passwordSalt = user.passwordSalt;
+                    user.roleId = roleId.id;
+                    var updateUser = _mapper.Map<User>(user);
+                    _contex.Users?.Update(updateUser);
+                    await _contex.SaveChangesAsync();
+                }
             }
         }
 

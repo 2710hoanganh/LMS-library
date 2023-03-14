@@ -3,6 +3,7 @@ using Azure.Core;
 using LMS_library.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Org.BouncyCastle.Asn1.Ocsp;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -21,17 +22,23 @@ namespace LMS_library.Repositories
 
         public async Task<string> AddUserAsync(UserModel model)
         {
+            var roleId = await _contex.Roles.FirstOrDefaultAsync(r => r.name == model.role);
+            if (roleId == null)
+            {
+                return ( "Role Not Existing");
+            }
             HashPassword(model.password
               , out byte[] passswordHash
               , out byte[] passwordSalt);
             var user = new User
             {
+                userCode= model.userCode,
                 email = model.email,
                 firstName= model.firstName,
                 lastName= model.lastName,
                 passwordHash = Convert.ToHexString(passswordHash),
                 passwordSalt = Convert.ToHexString(passwordSalt),
-                role= model.role,
+                roleId = roleId.id,
 
             };
             var newUser = _mapper.Map<User>(user);

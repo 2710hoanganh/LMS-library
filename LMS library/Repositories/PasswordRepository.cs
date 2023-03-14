@@ -22,18 +22,18 @@ namespace LMS_library.Repositories
             if (id == model.id)
             {
                 var user = await _contex.Users!.FindAsync(model.id);
-                if (VerifyHashPassword(model.oldPassword, Convert.FromHexString(user.passwordHash), Convert.FromHexString(user.passwordSalt)))
+                if ( VerifyHashPassword(model.oldPassword, Convert.FromHexString(user.passwordHash), Convert.FromHexString(user.passwordSalt)))
                 {
                     HashPassword(model.password
                     , out byte[] passswordHash
                     , out byte[] passwordSalt);
-
+                    user.userCode = user.userCode;
                     user.email = user.email;
                     user.firstName = user.firstName;
                     user.lastName = user.lastName;
                     user.passwordHash = Convert.ToHexString(passswordHash);
                     user.passwordSalt = Convert.ToHexString(passwordSalt);
-                    user.role = user.role;
+                    user.roleId = user.roleId;
                     var updateUser = _mapper.Map<User>(user);
                     _contex.Users?.Update(updateUser);
                     await _contex.SaveChangesAsync();

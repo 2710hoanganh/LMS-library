@@ -7,6 +7,8 @@ namespace LMS_library.Models
     {
         [Key]
         public int id { get; set; }
+        [Required]
+        public string userCode { get; set; }
         [Required, EmailAddress]
         public string email { get; set; } = string.Empty;
         [DefaultValue("First Name")]

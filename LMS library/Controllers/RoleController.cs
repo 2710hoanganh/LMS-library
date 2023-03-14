@@ -7,15 +7,17 @@ namespace LMS_library.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin,LeaderShip")]
+    [Authorize(Roles = "Admin,Leader")]
     public class RoleController : ControllerBase
     {
         private readonly IRoleRepository _repository;
+        private readonly IUserRepository _userRepository;
         private readonly DataDBContex _contex;
-        public RoleController(IRoleRepository repository, DataDBContex contex)
+        public RoleController(IRoleRepository repository, DataDBContex contex,IUserRepository userRepository)
         {
             _repository = repository;
             _contex = contex;
+            _userRepository = userRepository;   
         }
 
 
@@ -32,6 +34,7 @@ namespace LMS_library.Controllers
             }
         }
 
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetRole(int id)
         {
@@ -44,6 +47,7 @@ namespace LMS_library.Controllers
             catch { return BadRequest(); }
 
         }
+
 
         [HttpPost("add-role")]
         public async Task<IActionResult> AddNewRole(RoleModel model)
@@ -59,14 +63,21 @@ namespace LMS_library.Controllers
             }
             catch { return BadRequest(); }
         }
+        
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> DeleteRole([FromRoute] int id)
         {
 
             try
             {
+                var user = await _contex.Users!.FirstOrDefaultAsync(r => r.roleId == id);
+                if (user.roleId == id) 
+                {
+                    return BadRequest();
+                }
                 await _repository.DeleteRoleAsync(id);
                 return Ok("Delete Success !");
+
             }
             catch { return BadRequest(); }  
 

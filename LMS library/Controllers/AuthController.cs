@@ -38,6 +38,9 @@ namespace LMS_library.Controllers
             {
                 return BadRequest("User already exists .");
             }
+            var roleId = await _contex.Roles.FirstOrDefaultAsync(r => r.name == request.role);
+            if(roleId == null) { return BadRequest("Role not existing"); }
+
 
             //hash password
             HashPassword(request.password
@@ -46,10 +49,11 @@ namespace LMS_library.Controllers
 
             var user = new User
             {
+                userCode= request.userCode,
                 email = request.email,
                 passwordHash = Convert.ToHexString(passswordHash),
                 passwordSalt = Convert.ToHexString(passwordSalt),
-                role = request.role,
+                roleId = roleId.id,
 
             };
              _contex.Users.Add(user);
@@ -74,7 +78,8 @@ namespace LMS_library.Controllers
             {
                 return BadRequest("Password not correct");
             }
-            string token = CreateToken(user);
+            var role = await _contex.Roles.FirstOrDefaultAsync(r => r.id == user.roleId);
+            string token = CreateToken(user,role);
             return Ok(token) ;
         }
 
@@ -145,12 +150,12 @@ namespace LMS_library.Controllers
             return Convert.ToHexString(RandomNumberGenerator.GetBytes(64));
         }
         //function create token use in Login
-        private string CreateToken(User user) 
+        private string CreateToken(User user ,Role role) 
         {
             List<Claim> claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Email, user.email),
-                new Claim(ClaimTypes.Role, user.role),
+                new Claim(ClaimTypes.Role, role.name),
                 new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
                 new Claim(JwtRegisteredClaimNames.Iat,DateTime.UtcNow.ToString()),
             };

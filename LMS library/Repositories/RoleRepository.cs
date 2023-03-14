@@ -29,8 +29,8 @@ namespace LMS_library.Repositories
             var deleteRole = await _contex.Roles!.FindAsync(id);
             if (deleteRole != null)
             {
-                _contex.Roles.Remove(deleteRole);
-                await _contex.SaveChangesAsync();
+                    _contex.Roles.Remove(deleteRole);
+                    await _contex.SaveChangesAsync();
             }
         }
 
@@ -52,6 +52,7 @@ namespace LMS_library.Repositories
             {
                 var role = await _contex.Roles!.FindAsync(model.id);
                 role.name = model.name;
+                role.description = model.description;
                 role.create_At = role.create_At;
                 role.update_At = model.update_At;
                 var updateRole = _mapper.Map<Role>(role);
