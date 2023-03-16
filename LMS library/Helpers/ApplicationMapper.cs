@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using LMS_library.Data;
 using LMS_library.Repositories;
 
 namespace LMS_library.Helpers
@@ -12,6 +13,8 @@ namespace LMS_library.Helpers
             CreateMap<User, UserEditModel>().ReverseMap();
             CreateMap<User, Password>().ReverseMap();
             CreateMap<Role, RoleModel>().ReverseMap();
+            CreateMap< SystemDetail , SystemModel>().ReverseMap();
+            CreateMap<PrivateFiles, PrivateFileModel>().ReverseMap();
         }
     }
 }

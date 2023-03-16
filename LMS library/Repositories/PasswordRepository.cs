@@ -4,7 +4,7 @@ using System.Text;
 
 namespace LMS_library.Repositories
 {
-    public class PasswordRepository :IPasswordRepository
+    public class PasswordRepository : IPasswordRepository
     {
         private readonly IMapper _mapper;
         private readonly DataDBContex _contex;
@@ -22,7 +22,7 @@ namespace LMS_library.Repositories
             if (id == model.id)
             {
                 var user = await _contex.Users!.FindAsync(model.id);
-                if ( VerifyHashPassword(model.oldPassword, Convert.FromHexString(user.passwordHash), Convert.FromHexString(user.passwordSalt)))
+                if (VerifyHashPassword(model.oldPassword, Convert.FromHexString(user.passwordHash), Convert.FromHexString(user.passwordSalt)))
                 {
                     HashPassword(model.password
                     , out byte[] passswordHash

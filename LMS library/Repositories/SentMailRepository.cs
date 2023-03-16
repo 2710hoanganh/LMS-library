@@ -5,11 +5,11 @@ using MimeKit.Text;
 
 namespace LMS_library.Repositories
 {
-    public class SentMailRepository :ISentMailRepository
+    public class SentMailRepository : ISentMailRepository
     {
         public readonly IConfiguration _configuration;
-        public SentMailRepository(IConfiguration configuration) 
-        { 
+        public SentMailRepository(IConfiguration configuration)
+        {
             _configuration = configuration;
         }
 

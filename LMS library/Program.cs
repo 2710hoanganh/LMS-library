@@ -40,10 +40,12 @@ builder.Services.AddSwaggerGen(option =>
             new string[]{}
         }
     });
+
 });
 
 
 builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.AddHttpContextAccessor();
 
 // life cycle DL : AddSingleton(),AddTransient(),AddScoped() 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -51,6 +53,8 @@ builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IUserEditRepository, UserEditRepository>();
 builder.Services.AddScoped<IPasswordRepository, PasswordRepository>();
 builder.Services.AddScoped<ISentMailRepository, SentMailRepository>();
+builder.Services.AddScoped<ISystemRepository, SystemRepository>();
+builder.Services.AddScoped<IPrivateFileRepository, PrivateFileRepository>();
 
 
 //Jwt Token Functionality

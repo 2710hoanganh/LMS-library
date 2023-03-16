@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using LMS_library.Data;
 
 namespace LMS_library.Repositories
 {
@@ -9,7 +8,7 @@ namespace LMS_library.Repositories
         private readonly IMapper _mapper;
         private readonly DataDBContex _contex;
 
-        public RoleRepository(IMapper mapper ,DataDBContex  contex) 
+        public RoleRepository(IMapper mapper, DataDBContex contex)
         {
             _mapper = mapper;
             _contex = contex;
@@ -18,7 +17,7 @@ namespace LMS_library.Repositories
         public async Task<string> AddRoleAsync(RoleModel model)
         {
             var newRole = _mapper.Map<Role>(model);
-            newRole.create_At= DateTime.Now;    
+            newRole.create_At = DateTime.Now;
             _contex.Roles.Add(newRole);
             await _contex.SaveChangesAsync();
             return ("create successfully .");
@@ -29,8 +28,8 @@ namespace LMS_library.Repositories
             var deleteRole = await _contex.Roles!.FindAsync(id);
             if (deleteRole != null)
             {
-                    _contex.Roles.Remove(deleteRole);
-                    await _contex.SaveChangesAsync();
+                _contex.Roles.Remove(deleteRole);
+                await _contex.SaveChangesAsync();
             }
         }
 

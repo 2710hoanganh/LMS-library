@@ -1,6 +1,5 @@
 ﻿using LMS_library.Repositories;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LMS_library.Controllers
@@ -13,11 +12,11 @@ namespace LMS_library.Controllers
         private readonly IRoleRepository _repository;
         private readonly IUserRepository _userRepository;
         private readonly DataDBContex _contex;
-        public RoleController(IRoleRepository repository, DataDBContex contex,IUserRepository userRepository)
+        public RoleController(IRoleRepository repository, DataDBContex contex, IUserRepository userRepository)
         {
             _repository = repository;
             _contex = contex;
-            _userRepository = userRepository;   
+            _userRepository = userRepository;
         }
 
 
@@ -63,7 +62,7 @@ namespace LMS_library.Controllers
             }
             catch { return BadRequest(); }
         }
-        
+
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> DeleteRole([FromRoute] int id)
         {
@@ -71,7 +70,7 @@ namespace LMS_library.Controllers
             try
             {
                 var user = await _contex.Users!.FirstOrDefaultAsync(r => r.roleId == id);
-                if (user.roleId == id) 
+                if (user.roleId == id)
                 {
                     return BadRequest();
                 }
@@ -79,18 +78,18 @@ namespace LMS_library.Controllers
                 return Ok("Delete Success !");
 
             }
-            catch { return BadRequest(); }  
+            catch { return BadRequest(); }
 
         }
 
         [HttpPut("update/{id}")]
-        public async Task<IActionResult> UpdateRole(int id , [FromBody] RoleModel model)
+        public async Task<IActionResult> UpdateRole(int id, [FromBody] RoleModel model)
         {
             try
             {
-                if(model.id != id)
+                if (model.id != id)
                 {
-                    return NotFound();  
+                    return NotFound();
                 }
                 await _repository.UpdateRoleAsync(id, model);
                 return Ok("Update Successfully");

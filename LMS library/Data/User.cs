@@ -24,6 +24,8 @@ namespace LMS_library.Data
         public Role Role { get; set; }
 
         public string? resetToken { get; set; }  
-        public DateTime? resetTokenExpires { get; set; } 
+        public DateTime? resetTokenExpires { get; set; }
+
+        public virtual ICollection<PrivateFiles> files { get; set; }
     }
 }

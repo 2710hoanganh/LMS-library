@@ -1,12 +1,8 @@
 ﻿using AutoMapper;
-using Azure.Core;
-using Microsoft.AspNetCore.Identity;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace LMS_library.Repositories
 {
-    public class UserEditRepository :IUserEditRepository
+    public class UserEditRepository : IUserEditRepository
     {
         private readonly IMapper _mapper;
         private readonly DataDBContex _contex;
@@ -24,7 +20,7 @@ namespace LMS_library.Repositories
             {
                 var roleId = await _contex.Roles.FirstOrDefaultAsync(r => r.name == model.role);
                 var user = await _contex.Users!.FindAsync(model.id);
-                if(user != null||roleId != null)
+                if (user != null || roleId != null)
                 {
                     user.userCode = model.userCode;
                     user.email = model.email;
@@ -44,6 +40,6 @@ namespace LMS_library.Repositories
 
 
 
- 
+
     }
 }
