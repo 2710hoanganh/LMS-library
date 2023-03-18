@@ -26,49 +26,14 @@ namespace LMS_library.Controllers
             _httpContextAccessor = httpContextAccessor;
         }
 
-        private string GetUserEmail()
-        {
-            var result =  string.Empty;
-            if(_httpContextAccessor.HttpContext!=null)
-            {
-                result = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email);
-            }
-            return result;
-        }
 
-        [HttpPost("upload-private-file")]
-        public async Task<IActionResult> PostSingleFile(string name ,  [FromForm] PrivateFileUpload privateFileUpload  )
+        [HttpPost("upload-file")]
+        public async Task<IActionResult> PostMultiFile(List<IFormFile> privateFileUpload)
         {
             try
             {
-                var result = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email);
-                var user = await _contex.Users.FirstOrDefaultAsync(u => u.email == result);
-                var target = Path.Combine(_environment.ContentRootPath, "Private File");
-                if(!Directory.Exists(target))
-                {
-                    Directory.CreateDirectory(target);
-                }
-                if (privateFileUpload != null)
-                {
+                await _repository.PostMultiFileAsync(privateFileUpload);
 
-                    var filePath = Path.Combine(target, privateFileUpload.formFile.FileName);
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await privateFileUpload.formFile.CopyToAsync(stream);
-                    }
-                    var newfile = new PrivateFiles
-                    {
-                        fileName = name,
-                        fileType = Path.GetExtension(filePath),
-                        fileSize = filePath.Length.ToString(),
-                        filePath = filePath,
-                        uploadAt = DateTime.Now,
-                        updateAt = DateTime.Now,
-                        userId = user.id,
-                    };
-                    _contex.PrivateFiles?.Add(newfile);
-                    await _contex.SaveChangesAsync();
-                }
                 return Ok();
             }
             catch
@@ -76,5 +41,6 @@ namespace LMS_library.Controllers
                 return BadRequest();
             }
         }
+
     }
 }
