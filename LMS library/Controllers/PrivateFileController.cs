@@ -3,6 +3,7 @@ using LMS_library.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using MimeKit;
 using Org.BouncyCastle.Asn1.X509;
 using System.Security.Claims;
 
@@ -42,5 +43,32 @@ namespace LMS_library.Controllers
             }
         }
 
+        [HttpGet("download-file/{id}")]
+        public async Task<IActionResult> Download(int id)
+        {
+            try
+            {
+                var file = await _contex.PrivateFiles.FirstOrDefaultAsync(u => u.id == id);
+                if (file == null)
+                {
+                    return NotFound();
+                }
+                // create a memorystream
+                var memoryStream = new MemoryStream();
+
+                using (var stream = new FileStream(file.filePath, FileMode.Open))
+                {
+                    await stream.CopyToAsync(memoryStream);
+                }
+                // set the position to return the file from
+                memoryStream.Position = 0;
+                
+                return File(memoryStream, MimeTypes.GetMimeType(file.filePath), file.fileName);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
     }
 }

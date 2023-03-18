@@ -23,7 +23,8 @@ namespace LMS_library.Controllers
         {
             try
             {
-                if (_contex.System.Any(u => u.id == 1))
+                var count = await _contex.System.CountAsync();
+                if (count == 1)
                 {
                     return BadRequest("System detail already exists .");
                 }

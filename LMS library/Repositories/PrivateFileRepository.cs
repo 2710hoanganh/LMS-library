@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using System.Security.Claims;
+using System.IO;
 
 
 namespace LMS_library.Repositories
@@ -56,15 +57,27 @@ namespace LMS_library.Repositories
                 await _contex.SaveChangesAsync();
             }
         }
-
-
-
-
-        public async Task DownloadFileById(int id)
+        public async Task<List<PrivateFiles>> GetAll()
         {
-            throw new NotImplementedException();
+            var files = await _contex.PrivateFiles!.ToListAsync();
+            return _mapper.Map<List<PrivateFiles>>(files);
+        }
+        public async Task DeleteFileAsync(int id)
+        {
+            var deleteFile = await _contex.PrivateFiles.FindAsync(id);
+            if (deleteFile != null)
+            {
+                _contex.PrivateFiles.Remove(deleteFile);
+                await _contex.SaveChangesAsync();
+            }
+        }
+        public async Task UpdateFileAsync(int id, PrivateFileModel model)
+        {
+            if (id == model.id)
+            {
+
+            }
         }
 
- 
     }
 }
