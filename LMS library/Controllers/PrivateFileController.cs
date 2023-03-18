@@ -16,17 +16,38 @@ namespace LMS_library.Controllers
     {
         private readonly IPrivateFileRepository _repository;
         private readonly DataDBContex _contex;
-        private IHostEnvironment _environment;
-        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public PrivateFileController(IPrivateFileRepository repository,DataDBContex contex, IHostEnvironment environment, IHttpContextAccessor httpContextAccessor)
+        public PrivateFileController(IPrivateFileRepository repository,DataDBContex contex)
         {
             _repository = repository;
             _contex = contex;
-            _environment = environment;
-            _httpContextAccessor = httpContextAccessor;
+        }
+        [HttpGet("list")]
+        public async Task<IActionResult> GetAllFile()
+        {
+            try
+            {
+                return Ok(await _repository.GetAll());
+            }
+            catch
+            {
+                return BadRequest();
+            }
         }
 
+        [HttpDelete("delete/{id}")]
+        public async Task<IActionResult> DeleteFile([FromRoute] int id)
+        {
+
+            try
+            {
+                await _repository.DeleteFileAsync(id);
+                return Ok("Delete Success !");
+
+            }
+            catch { return BadRequest(); }
+
+        }
 
         [HttpPost("upload-file")]
         public async Task<IActionResult> PostMultiFile(List<IFormFile> privateFileUpload)
