@@ -71,12 +71,27 @@ namespace LMS_library.Repositories
                 await _contex.SaveChangesAsync();
             }
         }
-        public async Task UpdateFileAsync(int id, PrivateFileModel model)
+        public async Task UpdateFileAsync(string newName, int id)
         {
-            if (id == model.id)
-            {
 
-            }
+                var target = Path.Combine(_environment.ContentRootPath, "Private File");
+                var file = await _contex.PrivateFiles!.FindAsync(id);
+                if (file == null) { return; }
+            //file change Name
+                string FileName = newName + file.fileType;
+                var filePath = Path.Combine(target, FileName);
+                System.IO.File.Move(file.filePath, filePath);
+
+                file.fileName = FileName;
+                file.fileType = file.fileType;
+                file.fileSize = file.fileSize;
+                file.filePath = filePath;
+                file.uploadAt = file.uploadAt;
+                file.updateAt = DateTime.Now;
+                file.userId = file.userId;
+                _contex.PrivateFiles.Update(file);
+                await _contex.SaveChangesAsync();
+
         }
 
     }

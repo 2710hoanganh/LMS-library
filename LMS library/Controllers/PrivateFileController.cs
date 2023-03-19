@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MimeKit;
 using Org.BouncyCastle.Asn1.X509;
+using System.IO;
 using System.Security.Claims;
 
 namespace LMS_library.Controllers
@@ -38,12 +39,15 @@ namespace LMS_library.Controllers
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> DeleteFile([FromRoute] int id)
         {
-
             try
             {
-                await _repository.DeleteFileAsync(id);
-                return Ok("Delete Success !");
+                var file = await _contex.PrivateFiles.FirstOrDefaultAsync(u => u.id == id);
+                if (file == null){ return NotFound(); }
 
+                System.IO.File.Delete(file.filePath);
+
+                await _repository.DeleteFileAsync(id);
+                return Ok();
             }
             catch { return BadRequest(); }
 
@@ -85,6 +89,37 @@ namespace LMS_library.Controllers
                 memoryStream.Position = 0;
                 
                 return File(memoryStream, MimeTypes.GetMimeType(file.filePath), file.fileName);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+
+
+
+        }
+
+
+
+
+        [HttpPut("update/{id}")]
+        public async Task<IActionResult> UpdateRo(string newName ,int id)
+        {
+            try
+            {
+                var file = await _contex.PrivateFiles!.FirstOrDefaultAsync(u => u.id == id);
+                if (file == null)
+                {
+                    return NotFound();
+                }
+                if(newName == null)
+                {
+                    return BadRequest("Please Enter File Name");
+                }
+
+                await _repository.UpdateFileAsync(newName, id );
+
+                return Ok("Update Successfully");
             }
             catch
             {

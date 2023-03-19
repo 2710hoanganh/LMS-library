@@ -54,11 +54,7 @@ namespace LMS_library.Controllers
             };
             _contex.Users.Add(user);
             await _contex.SaveChangesAsync();
-            return Ok(new
-            {
-                user.passwordHash,
-                user.passwordSalt
-            });
+            return Ok();
 
         }
 
