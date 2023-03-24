@@ -1,17 +1,18 @@
 ﻿using LMS_library.Repositories;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LMS_library.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin,Leader")]
-    public class RoleController : ControllerBase
+    [Authorize(Roles = "Leader,Teacher")]
+    public class TopicController : ControllerBase
     {
-        private readonly IRoleRepository _repository;
+        private readonly IMaterialTopicRepository _repository;
         private readonly DataDBContex _contex;
-        public RoleController(IRoleRepository repository, DataDBContex contex)
+        public TopicController(IMaterialTopicRepository repository, DataDBContex contex)
         {
             _repository = repository;
             _contex = contex;
@@ -19,7 +20,7 @@ namespace LMS_library.Controllers
 
 
         [HttpGet("list")]
-        public async Task<IActionResult> GetAllRole()
+        public async Task<IActionResult> GetAll()
         {
             try
             {
@@ -32,7 +33,7 @@ namespace LMS_library.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetRole(int id)
+        public async Task<IActionResult> Get(int id)
         {
 
             try
@@ -44,33 +45,28 @@ namespace LMS_library.Controllers
 
         }
 
-        [HttpPost("add-role")]
-        public async Task<IActionResult> AddNewRole(RoleModel model)
+        [HttpPost("add-topic")]
+        public async Task<IActionResult> AddNewTopic(MaterialTopicModel model)
         {
             try
             {
-                if (_contex.Roles.Any(r => r.name == model.name))
+                if (_contex.Topics.Any(r => r.name == model.name))
                 {
-                    return BadRequest("Role already exists .");
+                    return BadRequest("Topic already exists .");
                 }
-                var newRole = await _repository.AddRoleAsync(model);
-                return Ok(newRole);
+                var newTopic = await _repository.AddTopicAsync(model);
+                return Ok(newTopic);
             }
             catch { return BadRequest(); }
         }
 
         [HttpDelete("delete/{id}")]
-        public async Task<IActionResult> DeleteRole([FromRoute] int id)
+        public async Task<IActionResult> Delete([FromRoute] int id)
         {
 
             try
             {
-                var user = await _contex.Users!.FirstOrDefaultAsync(r => r.roleId == id);
-                if (user.roleId == id)
-                {
-                    return BadRequest();
-                }
-                await _repository.DeleteRoleAsync(id);
+                await _repository.DeleteTopicAsync(id);
                 return Ok("Delete Success !");
 
             }
@@ -79,7 +75,7 @@ namespace LMS_library.Controllers
         }
 
         [HttpPut("update/{id}")]
-        public async Task<IActionResult> UpdateRole(int id, [FromBody] RoleModel model)
+        public async Task<IActionResult> UpdateRole(int id, [FromBody] MaterialTopicModel model)
         {
             try
             {
@@ -87,7 +83,7 @@ namespace LMS_library.Controllers
                 {
                     return NotFound();
                 }
-                await _repository.UpdateRoleAsync(id, model);
+                await _repository.UpdateTopicAsync(id, model);
                 return Ok("Update Successfully");
             }
             catch
@@ -95,6 +91,5 @@ namespace LMS_library.Controllers
                 return BadRequest();
             }
         }
-        //chua lam update nha
     }
 }

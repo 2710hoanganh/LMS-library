@@ -1,10 +1,12 @@
 ﻿using LMS_library.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LMS_library.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin,Leader")]
     public class SystemDetailController : ControllerBase
     {
 
@@ -15,8 +17,6 @@ namespace LMS_library.Controllers
             _repository = repository;
             _contex = contex;
         }
-
-
 
         [HttpPost("add-system-detail")]
         public async Task<IActionResult> AddNewDetail(SystemModel model)

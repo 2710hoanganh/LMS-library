@@ -13,6 +13,7 @@ namespace LMS_library.Controllers
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin,Leader")]
     public class PrivateFileController : ControllerBase
     {
         private readonly IPrivateFileRepository _repository;
@@ -24,7 +25,7 @@ namespace LMS_library.Controllers
             _contex = contex;
         }
         [HttpGet("list")]
-        public async Task<IActionResult> GetAllFile()
+        public async Task<IActionResult> GetAllFile()//get all private file
         {
             try
             {
@@ -98,9 +99,6 @@ namespace LMS_library.Controllers
 
 
         }
-
-
-
 
         [HttpPut("update/{id}")]
         public async Task<IActionResult> UpdateRo(string newName ,int id)

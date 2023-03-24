@@ -23,7 +23,7 @@ namespace LMS_library.Repositories
             return ("create successfully .");
         }
 
-        public async Task DeleteRoleAsync(int id)
+        public async Task DeleteRoleAsync(int id)//role id
         {
             var deleteRole = await _contex.Roles!.FindAsync(id);
             if (deleteRole != null)
@@ -39,7 +39,7 @@ namespace LMS_library.Repositories
             return _mapper.Map<List<Role>>(role);
         }
 
-        public async Task<RoleModel> GetById(int id)
+        public async Task<RoleModel> GetById(int id)//role id
         {
             var role = await _contex.Roles!.FindAsync(id);
             return _mapper.Map<RoleModel>(role);

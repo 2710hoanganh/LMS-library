@@ -21,5 +21,9 @@
         public DbSet<Role> Roles { get; set; }
         public DbSet<PrivateFiles> PrivateFiles { get; set; }
         public DbSet<SystemDetail> System { get; set; }
+        public DbSet<Course> Courses { get; set; }
+        public DbSet<CourseMaterial> Materials { get; set; }
+        public DbSet<MaterialTopic> Topics { get; set; }
+        public DbSet<MaterialType> MaterialTypes { get; set; }
     }
 }

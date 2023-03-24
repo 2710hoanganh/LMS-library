@@ -130,12 +130,6 @@ namespace LMS_library.Controllers
 
             return Ok("Password Change Successfully !");
         }
-
-
-
-
-
-
         //function create token use to rs password
         private string CreateRamdomToken()
         {

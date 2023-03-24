@@ -70,8 +70,8 @@ namespace LMS_library.Repositories
                 _contex.PrivateFiles.Remove(deleteFile);
                 await _contex.SaveChangesAsync();
             }
-        }
-        public async Task UpdateFileAsync(string newName, int id)
+        }//file id
+        public async Task UpdateFileAsync(string newName, int id) //newName = new file name + file id
         {
 
                 var target = Path.Combine(_environment.ContentRootPath, "Private File");

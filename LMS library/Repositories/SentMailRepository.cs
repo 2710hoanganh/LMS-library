@@ -13,7 +13,7 @@ namespace LMS_library.Repositories
             _configuration = configuration;
         }
 
-        public void SendEmail(SentMail request)
+        public void SendEmail(SentMail request)//sent mail config
         {
             var email = new MimeMessage();
             email.From.Add(MailboxAddress.Parse(_configuration.GetSection("EmailUsername").Value));

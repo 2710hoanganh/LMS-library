@@ -17,7 +17,7 @@ namespace LMS_library.Repositories
 
 
 
-        public async Task ChangePassword(int id, Password model)
+        public async Task ChangePassword(int id, Password model)//user id
         {
             if (id == model.id)
             {
