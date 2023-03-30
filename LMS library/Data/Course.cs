@@ -14,12 +14,12 @@ namespace LMS_library.Data
         [Required]
         public int? userId { get; set; }
         [ForeignKey("userId")]
-        public User User { get; set; }
+        public User? User { get; set; }
         public string description { get; set; } = string.Empty;
         public DateTime submission { get; set; }
         public int pendingMaterial { get; set; }
         public DateTime createDate { get; set; }= DateTime.Now;
-        public ICollection<MaterialTopic> topics { get; set; }
-        public ICollection<CourseMaterial> materials { get; set; }
+        public ICollection<Topic>? topics { get; set; }
+        public ICollection<CourseMaterial>? materials { get; set; }
     }
 }

@@ -52,10 +52,9 @@ namespace LMS_library.Controllers
                 return BadRequest();
             }
         }
-
-        [Authorize(Roles = "Leader,Student,Teacher")]
-        [HttpGet("material/list")]
-        public async Task<IActionResult> GetAll(int id)//course id , get all material (lesson or resourse) belong to the course 
+        [Authorize(Roles = "Leader,Teacher")]
+        [HttpGet("list")]
+        public async Task<IActionResult> GetAllFile(int id)//course id  , student cant see the pendding or reject file ,ONLY SEE THE FILE BEEN APPROVED
         {
             try
             {
@@ -66,6 +65,7 @@ namespace LMS_library.Controllers
                 return BadRequest();
             }
         }
+
 
         [Authorize(Roles = "Leader")]
         [HttpPut("approve/{id}")]
@@ -153,7 +153,7 @@ namespace LMS_library.Controllers
                     return BadRequest("Please Enter File Name");
                 }
 
-                await _repository.AddToTopic(topic, id);
+                await _repository.AddToResource(topic, id);
 
                 return Ok("Update Successfully");
             }
@@ -165,7 +165,7 @@ namespace LMS_library.Controllers
 
 
         [HttpGet("download-file/{id}")]
-        [Authorize(Roles = "Leader,Teacher")]
+        [Authorize(Roles = "Leader,Teacher,Student")]
         public async Task<IActionResult> Download(int id)// download file by file id
         {
             try
@@ -174,6 +174,10 @@ namespace LMS_library.Controllers
                 if (file == null)
                 {
                     return NotFound();
+                }
+                if(file.fileStatus != CourseMaterial.FileStatus.Approved)
+                {
+                    return BadRequest();
                 }
                 // create a memorystream
                 var memoryStream = new MemoryStream();
@@ -196,5 +200,18 @@ namespace LMS_library.Controllers
 
         }
 
+        [Authorize(Roles = "Leader,Teacher,Student")]
+        [HttpGet("search-sort")]
+        public async Task<IActionResult> SearchSort(string? course, string? teacher, string? status)
+        {
+            try
+            {
+                return Ok(await _repository.SearchSort(course, teacher, status));
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
     }
 }

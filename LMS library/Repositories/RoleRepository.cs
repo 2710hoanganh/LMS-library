@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 
 namespace LMS_library.Repositories
 {
@@ -43,6 +44,37 @@ namespace LMS_library.Repositories
         {
             var role = await _contex.Roles!.FindAsync(id);
             return _mapper.Map<RoleModel>(role);
+        }
+
+        public async Task<List<RoleModel>> Filter(string? filter)
+        {
+            var role = _contex.Roles.AsQueryable();
+
+            if (!string.IsNullOrEmpty(filter))
+            {
+                role = _contex.Roles.Where(u => u.name.Contains(filter));
+            }
+            var result = role.Select(u => new RoleModel
+            {
+                id = u.id,
+                name = u.name,
+                create_At = u.create_At,
+                update_At= u.update_At,
+            });
+            return result.ToList();
+        }
+
+
+        public async Task<string> TestAsyn([FromForm] RoleModel model)
+        {
+
+            
+                var newRole = _mapper.Map<Role>(model);
+                newRole.create_At = DateTime.Now;
+                _contex.Roles.Add(newRole);
+                await _contex.SaveChangesAsync();
+
+            return ("create successfully .");
         }
 
         public async Task UpdateRoleAsync(int id, RoleModel model)

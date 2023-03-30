@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using LMS_library.Data;
-using LMS_library.Repositories;
 
 namespace LMS_library.Helpers
 {
@@ -18,7 +17,10 @@ namespace LMS_library.Helpers
             CreateMap<MaterialType, MaterialTypeModel>().ReverseMap();
             CreateMap<Course , CourseModel>().ReverseMap();
             CreateMap<CourseMaterial, CourseMaterialModel>().ReverseMap();
-            CreateMap<MaterialTopic, MaterialTopicModel>().ReverseMap();
+            CreateMap<Topic, TopicModel>().ReverseMap();
+            CreateMap<Lesson, LessonModel>().ReverseMap();
+            CreateMap<ResourceList, ResourceModel>().ReverseMap();
+            CreateMap<Exam, ExamModel>().ReverseMap();
         }
     }
 }

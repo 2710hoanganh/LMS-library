@@ -53,6 +53,26 @@ namespace LMS_library.Repositories
             }
         }
 
+        public async Task<List<UserModel>> Filter(string? filter)
+        {
+            var user = _contex.Users.AsQueryable();
+
+            if (!string.IsNullOrEmpty(filter))
+            {
+                user = _contex.Users.Where(u => u.Role.name.Contains(filter));
+            }
+            var result = user.Select(u => new UserModel
+            {
+                id = u.id,
+                userCode = u.userCode,
+                email = u.email,
+                firstName = u.firstName,
+                lastName = u.lastName,
+                role = u.Role.name
+            });
+            return result.ToList();
+        }
+
         public async Task<List<User>> GetAll()
         {
             var user = await _contex.Users!.ToListAsync();
@@ -64,6 +84,32 @@ namespace LMS_library.Repositories
             var user = await _contex.Users!.FindAsync(id);
             return _mapper.Map<User>(user);
         }
+
+        public async Task<List<UserModel>> Search(string? search)
+        {
+            var user = _contex.Users.AsQueryable();
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                user =_contex.Users.Where(u => u.email.Contains(search)|| u.userCode.Contains(search) || u.firstName.Contains(search)|| u.lastName.Contains(search));
+            }
+            var result = user.Select(u => new UserModel
+            {
+                id = u.id,
+                userCode= u.userCode,
+                email = u.email,
+                firstName = u.firstName,    
+                lastName = u.lastName,
+                role = u.Role.name
+            });
+            return result.ToList(); 
+        }
+
+
+
+
+
+
 
         //Hash password function 
         private void HashPassword(string password, out byte[] passswordHash, out byte[] passwordSalt)

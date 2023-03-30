@@ -1,4 +1,5 @@
 ﻿using LMS_library.Repositories;
+using MailKit.Search;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -19,7 +20,7 @@ namespace LMS_library.Controllers
         }
         [Authorize(Roles = "Admin,Leader")]
         [HttpPost("add-course")]
-        public async Task<IActionResult> AddNewRole(CourseModel model)
+        public async Task<IActionResult> AddNewCourse(CourseModel model)
         {
             try
             {
@@ -46,9 +47,6 @@ namespace LMS_library.Controllers
                 return BadRequest();
             }
         }
-
-
-
         [HttpGet("teacher-course-list")]
         [Authorize(Roles = "Teacher")]
         public async Task<IActionResult> GetAllCourseForTeacher()// get the list of subjects taught by the teacher by teacher id
@@ -88,7 +86,6 @@ namespace LMS_library.Controllers
             catch { return BadRequest(); }
 
         }
-        [Authorize(Roles = "Admin,Leader")]
         [HttpPut("update/{id}")]
         public async Task<IActionResult> UpdateCourse(int id, [FromBody] CourseModel model)
         {
@@ -98,12 +95,38 @@ namespace LMS_library.Controllers
                 {
                     return NotFound();
                 }
-                var teacher = await _contex.Users.FirstOrDefaultAsync(u => u.email == model.teacherEmail);
+                var teacher = await _contex.Users!.FirstOrDefaultAsync(u => u.email == model.teacherEmail);
+                if (teacher == null) { return BadRequest() ; }
                 var role = await _contex.Roles.FirstOrDefaultAsync(r => r.id == teacher.roleId);
                 if (teacher == null) { return NotFound(); }
                 if(role == null || role.name != "Teacher" ) { return BadRequest(); }
                 await _repository.UpdateCourseAsync(id, model);
                 return Ok("Update Successfully");
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpGet("search-sort")]
+        public async Task<IActionResult> SearchSort(string? search , string? course ,string?teacher , string?status)
+        {
+            try
+            {
+                return Ok(await _repository.SearchSort(search,course,teacher,status));
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+        [HttpGet("filter")]
+        public async Task<IActionResult> Filter()
+        {
+            try
+            {
+                return Ok(await _repository.Fillter());
             }
             catch
             {

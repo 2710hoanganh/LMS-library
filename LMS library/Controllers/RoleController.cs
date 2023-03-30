@@ -66,7 +66,7 @@ namespace LMS_library.Controllers
             try
             {
                 var user = await _contex.Users!.FirstOrDefaultAsync(r => r.roleId == id);
-                if (user.roleId == id)
+                if (user == null|| user.roleId == id )
                 {
                     return BadRequest();
                 }
@@ -95,6 +95,24 @@ namespace LMS_library.Controllers
                 return BadRequest();
             }
         }
-        //chua lam update nha
+
+
+
+        [HttpGet("search-role")]
+        public async Task<IActionResult> Search(string? search)
+        {
+            try
+            {
+                return Ok(await _repository.Filter(search));
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
+
+
+
     }
 }

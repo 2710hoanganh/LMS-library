@@ -1,7 +1,8 @@
 ﻿using AutoMapper;
 using System.Security.Claims;
 using System.IO;
-
+using LMS_library.Data;
+using LMS_library.Models;
 
 namespace LMS_library.Repositories
 {
@@ -94,5 +95,45 @@ namespace LMS_library.Repositories
 
         }
 
+        public async Task<List<PrivateFileModel>> Filter(string? type)
+        {
+            var file = _contex.PrivateFiles.AsQueryable();
+            if (!string.IsNullOrEmpty(type))
+            {
+                file = _contex.PrivateFiles.OrderBy(m => m.fileType.Contains(type) );
+            }
+            
+
+            var result = file.Select(m => new PrivateFileModel
+            {
+                id= m.id,
+                fileName = m.fileName,
+                fileType= m.fileType,
+                fileSize= m.fileSize,
+                uploadAt = m.uploadAt,
+                updateAt= m.updateAt,
+            });
+            return result.ToList();
+        }
+        public async Task<List<PrivateFileModel>> Search(string? search)
+        {
+            var file = _contex.PrivateFiles.AsQueryable();
+            if (!string.IsNullOrEmpty(search))
+            {
+                file = _contex.PrivateFiles.Where(m => m.fileName.Contains(search)|| m.fileType.Contains(search));
+            }
+
+
+            var result = file.Select(m => new PrivateFileModel
+            {
+                id = m.id,
+                fileName = m.fileName,
+                fileType = m.fileType,
+                fileSize = m.fileSize,
+                uploadAt = m.uploadAt,
+                updateAt = m.updateAt,
+            });
+            return result.ToList();
+        }
     }
 }

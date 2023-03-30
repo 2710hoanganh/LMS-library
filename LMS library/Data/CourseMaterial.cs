@@ -12,7 +12,6 @@ namespace LMS_library.Data
             Approved =1 ,
             Reject = 2 ,
         }
-
         [Key]
         public int id { get; set; }
         [Required]
@@ -20,22 +19,26 @@ namespace LMS_library.Data
         [Required] 
         public int materialTypeID { get;set; }
         [ForeignKey("materialTypeID")]
+        public MaterialType MaterialType { get; set; }
         [Required]
-        public int userId { get; set; }
-        [ForeignKey("userId")]
+        public int? UserId { get; set; }
+        [ForeignKey("UserId")]
+        public User User { get; set; }
         public int? courseId { get; set; }
         [ForeignKey("courseId")]
-        public int? materialTopicId { get; set; }
-        [ForeignKey("materialTopicId")]
+
+        public Course courses { get; set; }
+        public int? resourceId { get; set; }
+        [ForeignKey("resourceId")]
+        public ResourceList ResourceList { get; set; }
         public FileStatus fileStatus { get; set; }
         public string materialPath { get; set; }
         public int fileSize { get; set; }
 
         public DateTime submission_date { get; set; }
-        public MaterialType MaterialType { get; set; }
 
-        public Course courses { get; set; }
-        public MaterialTopic MaterialTopic { get; set; }
+        public  Lesson Lesson { get; set; }
+
 
 
     }

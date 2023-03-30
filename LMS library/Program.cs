@@ -12,6 +12,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
+builder.Services.AddControllersWithViews()
+    .AddNewtonsoftJson(options =>
+    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(option =>
@@ -55,6 +59,13 @@ builder.Services.AddScoped<IPasswordRepository, PasswordRepository>();
 builder.Services.AddScoped<ISentMailRepository, SentMailRepository>();
 builder.Services.AddScoped<ISystemRepository, SystemRepository>();
 builder.Services.AddScoped<IPrivateFileRepository, PrivateFileRepository>();
+builder.Services.AddScoped<IMaterialTypeRepository, MaterialTypeRepository>();
+builder.Services.AddScoped<ICourseRepository, CourseRepository>();
+builder.Services.AddScoped<ICourseMaterialRepository, CourseMaterialRepository>();
+builder.Services.AddScoped<IMaterialTopicRepository, MaterialTopicRepository>();
+builder.Services.AddScoped<ILessonRepository, LessonRepository>();
+builder.Services.AddScoped<IResourceRepository, ResourceRepository>();
+builder.Services.AddScoped<IExamRepository, ExamRepository>();
 
 
 //Jwt Token Functionality

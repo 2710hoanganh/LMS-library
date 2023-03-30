@@ -124,5 +124,30 @@ namespace LMS_library.Controllers
                 return BadRequest();
             }
         }
+
+        [HttpGet("filter")]
+        public async Task<IActionResult> Filter(string? type)//get all private file
+        {
+            try
+            {
+                return Ok(await _repository.Filter(type));
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+        [HttpGet("search")]
+        public async Task<IActionResult> Search(string? search)//get all private file
+        {
+            try
+            {
+                return Ok(await _repository.Search(search));
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
     }
 }

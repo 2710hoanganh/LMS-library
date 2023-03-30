@@ -2,10 +2,10 @@
 {
     public interface IMaterialTopicRepository
     {
-        public Task<List<MaterialTopic>> GetAll();
-        public Task<MaterialTopicModel> GetById(int id);
-        public Task<string> AddTopicAsync(MaterialTopicModel model);
-        public Task UpdateTopicAsync(int id, MaterialTopicModel model);
+        public Task<List<Topic>> GetAll(int id);
+        public Task<TopicModel> GetById(int id);
+        public Task<string> AddTopicAsync(TopicModel model);
+        public Task UpdateTopicAsync(int id, TopicModel model);
         public Task DeleteTopicAsync(int id);
     }
 }

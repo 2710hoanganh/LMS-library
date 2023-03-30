@@ -16,7 +16,7 @@ namespace LMS_library.Models
         public string teacherEmail { get; set; }
         [Required]
         public string courseName { get; set; } = string.Empty;
-        public string topicName { get; set; }=string.Empty;
+        public string lessonName { get; set; }= string.Empty;
         public FileStatus fileStatus { get; set; }
         public string materialPath { get; set; }
         public int fileSize { get; set; }

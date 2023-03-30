@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using System.Security.Claims;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace LMS_library.Repositories
 {
@@ -60,7 +62,7 @@ namespace LMS_library.Repositories
                 {
                     name = file.FileName,
                     materialTypeID = materialType.id,
-                    userId = user.id,
+                    UserId = user.id,
                     courseId = courseID,
                     fileStatus = 0,
                     materialPath = filePath,
@@ -105,8 +107,9 @@ namespace LMS_library.Repositories
             material.submission_date = material.submission_date;
             material.fileStatus = material.fileStatus;
             material.courseId = material.courseId;
-            material.userId = material.userId;
-            material.materialTopicId= material.materialTopicId;
+            material.resourceId = material.resourceId;
+            material.UserId = material.UserId;
+   
             _contex.Materials.Update(material);
             await _contex.SaveChangesAsync();
         }
@@ -142,17 +145,20 @@ namespace LMS_library.Repositories
                 material.fileSize = material.fileSize;
                 material.submission_date = material.submission_date;
                 material.fileStatus = status;
+                material.UserId = material.UserId;
+                material.resourceId = material.resourceId;
                 material.courseId = material.courseId;
                 _contex.Materials.Update(material);
                 await _contex.SaveChangesAsync();
             }
         }
 
-        public async Task AddToTopic(string topicName, int id)
+        public async Task AddToResource(string lessonName, int id)
         {
             var material = await _contex.Materials!.FindAsync(id);
-            var topic = await _contex.Topics!.FirstOrDefaultAsync(t => t.name == topicName);
-            if(topic ==null || material== null ||material.fileStatus == CourseMaterial.FileStatus.Reject || material.fileStatus == CourseMaterial.FileStatus.Pendding)
+            var lesson = await _contex.Lessons!.FirstOrDefaultAsync(t => t.name == lessonName);
+            var resource = await _contex.ResourceLists.FirstOrDefaultAsync(r => r.lessonId == lesson.id);
+            if(lesson == null || material== null||resource ==null ||material.fileStatus == CourseMaterial.FileStatus.Reject || material.fileStatus == CourseMaterial.FileStatus.Pendding)
             {
                 return;
             }
@@ -164,10 +170,62 @@ namespace LMS_library.Repositories
             material.submission_date= material.submission_date;
             material.fileStatus= material.fileStatus;
             material.courseId = material.courseId;
-            material.courseId=  material.courseId;
-            material.materialTopicId = topic.id;
+            material.UserId = material.UserId;
+            material.resourceId = resource.id;
             _contex.Materials.Update(material);
             await _contex.SaveChangesAsync();
+        }
+
+        public async Task<List<CourseMaterialModel>> SearchSort(string? course, string? teacher, string? status)
+        {
+            var material = _contex.Materials.AsQueryable(); 
+            if(!string.IsNullOrEmpty(course) )
+            {
+                material = _contex.Materials.Where(c => c.courses.courseName.Contains(course));
+            }
+            if (!string.IsNullOrEmpty(teacher))
+            {
+                material = _contex.Materials.Where(c => c.User.email.Contains(teacher));
+            }
+            if (!string.IsNullOrEmpty(status))
+            {
+                var fileStatus = CourseMaterial.FileStatus.Pendding;
+                if(status == "Pendding")
+                {
+                    fileStatus = CourseMaterial.FileStatus.Pendding;
+                }
+                if(status == "Approved")
+                {
+                    fileStatus = CourseMaterial.FileStatus.Approved;
+                }
+                if (status == "Reject")
+                {
+                    fileStatus = CourseMaterial.FileStatus.Reject;
+                }
+                material = _contex.Materials.Where(c => c.fileStatus.Equals(fileStatus));
+            }
+            var resutl = material.Select(r =>new CourseMaterialModel
+            {
+                id = r.id,
+                name = r.name,
+                materialType = r.MaterialType.name,
+                teacherEmail = r.User.email,
+                courseName = r.courses.courseName,
+                fileStatus = r.fileStatus,
+                materialPath = r.materialPath,
+                fileSize = r.fileSize,
+                submission_date= r.submission_date,
+
+            });
+
+
+            return resutl.ToList();
+
+        }
+
+        public async Task<List<CourseMaterialModel>> Fillter()
+        {
+            throw new NotImplementedException();
         }
     }
 }

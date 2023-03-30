@@ -37,7 +37,33 @@ namespace LMS_library.Controllers
             }
         }
 
+        [HttpGet("search")]
+        [Authorize(Roles = "Admin,Leader")]
+        public async Task<IActionResult> Search(string? search)
+        {
+            try
+            {
+                return Ok(await _repository.Search(search));
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
 
+        [HttpGet("filter-by-role")]
+        [Authorize(Roles = "Admin,Leader")]
+        public async Task<IActionResult> Filter(string? filter)
+        {
+            try
+            {
+                return Ok(await _repository.Filter(filter));
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
         [HttpGet("{id}")]
         [Authorize(Roles = "Admin,Leader")]
         public async Task<IActionResult> GetUser(int id)

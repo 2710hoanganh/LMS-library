@@ -71,6 +71,7 @@ namespace LMS_library.Controllers
                 return BadRequest("Password not correct");
             }
             var role = await _contex.Roles.FirstOrDefaultAsync(r => r.id == user.roleId);
+            if (role == null) { return BadRequest(); }
             string token = CreateToken(user, role);
             return Ok(token);
         }

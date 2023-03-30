@@ -2,7 +2,7 @@
 
 namespace LMS_library.Models
 {
-    public class MaterialTopicModel
+    public class TopicModel
     {
         public int id { get; set; }
         [Required]

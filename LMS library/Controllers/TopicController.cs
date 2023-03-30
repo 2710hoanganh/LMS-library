@@ -20,11 +20,11 @@ namespace LMS_library.Controllers
 
 
         [HttpGet("list")]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(int id)
         {
             try
             {
-                return Ok(await _repository.GetAll());
+                return Ok(await _repository.GetAll(id));
             }
             catch
             {
@@ -46,7 +46,7 @@ namespace LMS_library.Controllers
         }
 
         [HttpPost("add-topic")]
-        public async Task<IActionResult> AddNewTopic(MaterialTopicModel model)
+        public async Task<IActionResult> AddNewTopic(TopicModel model)
         {
             try
             {
@@ -75,7 +75,7 @@ namespace LMS_library.Controllers
         }
 
         [HttpPut("update/{id}")]
-        public async Task<IActionResult> UpdateRole(int id, [FromBody] MaterialTopicModel model)
+        public async Task<IActionResult> UpdateRole(int id, [FromBody] TopicModel model)
         {
             try
             {

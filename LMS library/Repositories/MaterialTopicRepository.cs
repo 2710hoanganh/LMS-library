@@ -15,17 +15,17 @@ namespace LMS_library.Repositories
             _mapper = mapper;
             _contex = contex;
         }
-        public async Task<string> AddTopicAsync(MaterialTopicModel model)
+        public async Task<string> AddTopicAsync(TopicModel model)
         {
             var course = await _contex.Courses.FirstOrDefaultAsync(u => u.courseName == model.courseName);
             if (course == null) { return ("Course not existing"); }
-            var topic = new MaterialTopic
+            var topic = new Topic
             {
                 name = model.name,
                 description= model.description,
                 courseId = course.id
             };
-            var newTopic = _mapper.Map<MaterialTopic>(topic);
+            var newTopic = _mapper.Map<Topic>(topic);
             _contex.Topics.Add(newTopic);
             await _contex.SaveChangesAsync();
             return ("create successfully .");
@@ -34,39 +34,30 @@ namespace LMS_library.Repositories
         public async Task DeleteTopicAsync(int id)
         {
             var delete = await _contex.Topics!.FindAsync(id);
-            var material = await _contex.Materials.Where(m => m.materialTopicId == id).ToListAsync();
-            if (delete != null)
-            {
-                foreach( var m in material)
-                {
-                    m.materialTopicId = null;
-                    await _contex.SaveChangesAsync();
-                }
-                _contex.Topics.Remove(delete);
-                await _contex.SaveChangesAsync();
-            }
+            _contex.Topics.Remove(delete);
+            await _contex.SaveChangesAsync();
         }
 
-        public async Task<List<MaterialTopic>> GetAll()
+        public async Task<List<Topic>> GetAll(int id)
         {
-            var topic = await _contex.Topics!.ToListAsync();
-            return _mapper.Map<List<MaterialTopic>>(topic);
+            var topic = await _contex.Topics!.Where(t => t.courseId == id).ToListAsync();
+            return _mapper.Map<List<Topic>>(topic);
         }
 
-        public async Task<MaterialTopicModel> GetById(int id)
+        public async Task<TopicModel> GetById(int id)
         {
             var topic = await _contex.Topics!.FindAsync(id);
-            return _mapper.Map<MaterialTopicModel>(topic);
+            return _mapper.Map<TopicModel>(topic);
         }
 
-        public async Task UpdateTopicAsync(int id, MaterialTopicModel model)
+        public async Task UpdateTopicAsync(int id, TopicModel model)
         {
             var course = await _contex.Courses.FirstOrDefaultAsync(u => u.courseName == model.courseName);
             var topic = await _contex.Topics!.FindAsync(model.id);
             topic.name = model.name;
             topic.description = model.description;  
             course.id = course.id;
-            var update = _mapper.Map<MaterialTopic>(topic);
+            var update = _mapper.Map<Topic>(topic);
             _contex.Topics?.Update(update);
             await _contex.SaveChangesAsync();
         }

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 
 namespace LMS_library.Repositories
@@ -92,6 +93,58 @@ namespace LMS_library.Repositories
                 _contex.Courses?.Update(updateCourse);
                 await _contex.SaveChangesAsync();
             }
+        }
+        public async Task<List<CourseModel>> SearchSort(string? search, string? course, string? teacher, string? courseCode)
+        {
+            var courses = _contex.Courses.AsQueryable();
+            if (!string.IsNullOrEmpty(search))
+            {
+                courses = _contex.Courses.Where(m => m.courseName.Contains(search));
+            }
+            if (!string.IsNullOrEmpty(course))
+            {
+                courses = _contex.Courses.Where(m => m.courseName.Contains(search));
+            }
+            if (!string.IsNullOrEmpty(teacher))
+            {
+                courses = _contex.Courses.Where(m => m.User.email.Contains(teacher));
+            }
+            if (!string.IsNullOrEmpty(courseCode))
+            {
+                courses = _contex.Courses.Where(m => m.courseCode.Contains(courseCode));
+            }
+
+
+
+            var result = courses.Select(r => new CourseModel
+            {
+                id = r.id,
+                courseCode = r.courseCode,
+                courseName = r.courseName,
+                teacherEmail =r.User.email,
+                description =r.description,
+                submission = r.submission,
+                createDate = r.createDate
+            });
+            return result.ToList(); 
+        }
+
+        public async Task<List<CourseModel>> Fillter()
+        {
+            var courses = _contex.Courses.OrderBy(c => c.courseName);
+
+
+            var result = courses.Select(r => new CourseModel
+            {
+                id = r.id,
+                courseCode = r.courseCode,
+                courseName = r.courseName,
+                teacherEmail = r.User.email,
+                description = r.description,
+                submission = r.submission,
+                createDate = r.createDate
+            });
+            return result.ToList();
         }
     }
 }

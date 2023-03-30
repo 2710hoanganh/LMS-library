@@ -4,6 +4,7 @@ using LMS_library.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LMS_library.Migrations
 {
     [DbContext(typeof(DataDBContex))]
-    partial class DataDBContexModelSnapshot : ModelSnapshot
+    [Migration("20230326123141_System")]
+    partial class System
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -112,52 +115,6 @@ namespace LMS_library.Migrations
                     b.HasIndex("resourceId");
 
                     b.ToTable("Materials");
-                });
-
-            modelBuilder.Entity("LMS_library.Data.Exam", b =>
-                {
-                    b.Property<int>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
-
-                    b.Property<string>("courseName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("create_At")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("examStatus")
-                        .HasColumnType("int");
-
-                    b.Property<int>("examType")
-                        .HasColumnType("int");
-
-                    b.Property<string>("fileName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("filePath")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("fileType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("teacherEmail")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("time")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("id");
-
-                    b.ToTable("Exams");
                 });
 
             modelBuilder.Entity("LMS_library.Data.Lesson", b =>

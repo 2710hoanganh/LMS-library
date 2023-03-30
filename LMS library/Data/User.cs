@@ -9,7 +9,7 @@ namespace LMS_library.Data
         [Key] 
         public int id { get; set; }
         [Required]
-        public string userCode { get; set; }
+        public string userCode { get; set; } = string.Empty;
    
         [Required]
         public string email { get; set; } = string.Empty;
