@@ -107,11 +107,11 @@ namespace LMS_library.Repositories
                 if (file.Length <= 0) return;
 
                 var filePath = Path.Combine(target, file.FileName);
-                if(Path.GetExtension(filePath) == ".xlsx")
-                {
-                    int row = filePath.;
+                //if(Path.GetExtension(filePath) == ".xlsx")
+                //{
+                    //int row = filePath.;
 
-                }
+                //}
 
                 using (var stream = new FileStream(filePath, FileMode.Create))
                 {
