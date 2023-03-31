@@ -54,12 +54,27 @@ namespace LMS_library.Controllers
         }
 
         [Authorize(Roles = "Leader,Teacher")]
-        [HttpPost("upload-file")]
-        public async Task<IActionResult> PostMultiFile(string name, string type, string time ,List<IFormFile> privateFileUpload)
+        [HttpPost("upload-word-file")]
+        public async Task<IActionResult> PostWordFile(string name, string time ,List<IFormFile> privateFileUpload)
         {
             try
             {
-                await _repository.PostWordAsync(name , type ,time,privateFileUpload);
+                await _repository.PostWordAsync(name ,time,privateFileUpload);
+
+                return Ok();
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+        [Authorize(Roles = "Leader,Teacher")]
+        [HttpPost("upload-excel-file")]
+        public async Task<IActionResult> PostExcelFile(string name, string time, List<IFormFile> privateFileUpload)
+        {
+            try
+            {
+                await _repository.PostExcelAsync(name, time, privateFileUpload);
 
                 return Ok();
             }
@@ -153,6 +168,32 @@ namespace LMS_library.Controllers
                 }
 
                 await _repository.UpdateFileAsync(newName, id);
+
+                return Ok("Update Successfully");
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
+        [Authorize(Roles = "Leader")]
+        [HttpPut("approve/{id}")]
+        public async Task<IActionResult> FileApprove(string check, int id) // check = file status (approved or reject),id = file id (lesson or resourse) ,leader can approved or rejected the file 
+        {
+            try
+            {
+                var file = await _contex.Exams!.FirstOrDefaultAsync(u => u.id == id);
+                if (file == null)
+                {
+                    return NotFound();
+                }
+                if (check == null)
+                {
+                    return BadRequest("Please Enter Choose Approve Or Reject File");
+                }
+
+                await _repository.FileApprove(check, id);
 
                 return Ok("Update Successfully");
             }

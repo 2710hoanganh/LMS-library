@@ -1,5 +1,11 @@
 ﻿using AutoMapper;
 using System.Security.Claims;
+using ExcelDataReader;
+using System.Data;
+using OfficeOpenXml;
+using Microsoft.Office.Interop.Excel;
+using System.Runtime.InteropServices;
+
 
 namespace LMS_library.Repositories
 {
@@ -19,7 +25,7 @@ namespace LMS_library.Repositories
         }
 
 
-        public async Task PostWordAsync(string name ,string type,string time , List<IFormFile> privateFileUploads)
+        public async Task PostWordAsync(string name,string time , List<IFormFile> privateFileUploads)
         {
             var result = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email);
             if (result == null)
@@ -36,15 +42,6 @@ namespace LMS_library.Repositories
             if (!Directory.Exists(target))
             {
                 Directory.CreateDirectory(target);
-            }
-            var typeExam = Exam.ExamType.Selected;
-            if (type == "Selected")
-            {
-                typeExam = Exam.ExamType.Selected;
-            }
-            if (type == "Contructed")
-            {
-                typeExam = Exam.ExamType.Contructed;
             }
 
             foreach (var file in privateFileUploads)
@@ -64,7 +61,7 @@ namespace LMS_library.Repositories
                     filePath = filePath,
                     courseName = name,
                     teacherEmail = result,
-                    examType = typeExam,
+                    examType = Exam.ExamType.Contructed,
                     time = time,
                     examStatus = Exam.ExamStatus.Draft,
                     create_At= DateTime.Now,
@@ -74,7 +71,7 @@ namespace LMS_library.Repositories
             }
         }
 
-        public async Task PostExcelAsync(string name, string type, string time, List<IFormFile> privateFileUploads)
+        public async Task PostExcelAsync(string name,string time, List<IFormFile> privateFileUploads)
         {
             var result = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email);
             if (result == null)
@@ -92,31 +89,18 @@ namespace LMS_library.Repositories
             {
                 Directory.CreateDirectory(target);
             }
-            var typeExam = Exam.ExamType.Selected;
-            if (type == "Selected")
-            {
-                typeExam = Exam.ExamType.Selected;
-            }
-            if (type == "Contructed")
-            {
-                typeExam = Exam.ExamType.Contructed;
-            }
 
             foreach (var file in privateFileUploads)
             {
+
                 if (file.Length <= 0) return;
-
                 var filePath = Path.Combine(target, file.FileName);
-                if(Path.GetExtension(filePath) == ".xlsx")
-                {
-
-
-                }
-
+                if (Path.GetExtension(filePath) != ".xlsx") { return; }
                 using (var stream = new FileStream(filePath, FileMode.Create))
                 {
                     await file.CopyToAsync(stream);
                 }
+
                 var newfile = new Exam
                 {
                     fileType = Path.GetExtension(filePath),
@@ -124,7 +108,7 @@ namespace LMS_library.Repositories
                     filePath = filePath,
                     courseName = name,
                     teacherEmail = result,
-                    examType = typeExam,
+                    examType = Exam.ExamType.Selected,
                     time = time,
                     examStatus = Exam.ExamStatus.Draft,
                     create_At = DateTime.Now,
@@ -205,5 +189,6 @@ namespace LMS_library.Repositories
                 await _contex.SaveChangesAsync();
             }
         }
+
     }
 }

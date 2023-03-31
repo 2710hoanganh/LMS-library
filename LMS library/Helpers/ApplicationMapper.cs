@@ -21,6 +21,7 @@ namespace LMS_library.Helpers
             CreateMap<Lesson, LessonModel>().ReverseMap();
             CreateMap<ResourceList, ResourceModel>().ReverseMap();
             CreateMap<Exam, ExamModel>().ReverseMap();
+            CreateMap<MultipleChoiceQuestions, QuestionsModel>().ReverseMap();
         }
     }
 }
