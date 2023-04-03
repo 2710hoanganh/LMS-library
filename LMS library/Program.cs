@@ -66,6 +66,7 @@ builder.Services.AddScoped<IMaterialTopicRepository, MaterialTopicRepository>();
 builder.Services.AddScoped<ILessonRepository, LessonRepository>();
 builder.Services.AddScoped<IResourceRepository, ResourceRepository>();
 builder.Services.AddScoped<IExamRepository, ExamRepository>();
+builder.Services.AddScoped<IQuestionsRepository, QuestionsRepository>();
 
 
 //Jwt Token Functionality

@@ -7,7 +7,7 @@ namespace LMS_library.Data
         public enum DifficultLevel
         {
             Easy = 0,
-            Nomal =1  ,
+            Normal =1  ,
             Hard =2 ,
         }
 
@@ -15,6 +15,7 @@ namespace LMS_library.Data
         public int id { get; set; }
         public DifficultLevel difficultLevel { get; set; }
         public string courseName { get; set; }
+        public string teacherEmail { get; set; }
         public string questionName { get; set; }
         public string answerA { get; set; }
         public string answerB { get; set; }

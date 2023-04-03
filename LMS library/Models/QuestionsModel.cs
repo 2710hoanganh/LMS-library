@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using static LMS_library.Data.MultipleChoiceQuestions;
 
 namespace LMS_library.Models
@@ -7,9 +8,13 @@ namespace LMS_library.Models
     {
         public int id { get; set; }
         [Required]
-        public int difficultLevel { get; set; }
+        [DefaultValue("Easy")]
+        public string difficultLevel { get; set; }
         [Required]
         public string courseName { get; set; }
+        [Required]
+        [EmailAddress]
+        public string teacherEmail { get; set; }
         [Required]
         public string questionName { get; set; }
         [Required]

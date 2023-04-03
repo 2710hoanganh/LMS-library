@@ -32,6 +32,6 @@ namespace LMS_library.Data
         public DbSet<Lesson> Lessons { get; set; }
         public DbSet<ResourceList> ResourceLists { get; set; }
         public DbSet<Exam> Exams { get; set; }
-
+        public DbSet<MultipleChoiceQuestions> Questions { get; set; }
     }
 }
