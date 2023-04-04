@@ -202,6 +202,37 @@ namespace LMS_library.Controllers
                 return BadRequest();
             }
         }
+        [Authorize(Roles = "Leader,Teacher")]
+        [HttpPost("create-multi-choise-exam-on-system")]
+        public async Task<IActionResult> CreateMultiCHoiseExam([FromBody] MultiChoiseExamModel model)
+        {
+            try
+            {
+                
+                await _repository.CreateMultiChoiseExamOnSystem(model);
 
+                return Ok();
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+        [Authorize(Roles = "Leader,Teacher")]
+        [HttpPost("create-essy-exam-on-system")]
+        public async Task<IActionResult> CreateEssayExam([FromBody] EssayExamModel model)
+        {
+            try
+            {
+
+                await _repository.CreateEssayExamOnSystem(model);
+
+                return Ok();
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
     }
 }

@@ -64,7 +64,7 @@ namespace LMS_library.Repositories
 
             var question = _mapper.Map<MultipleChoiceQuestions>(newQuestion);
             _contex.Questions.Add(question);
-            await _contex.SaveChangesAsync();
+            await _contex.SaveChangesAsync();   
             return ("create successfully .");
         }
 

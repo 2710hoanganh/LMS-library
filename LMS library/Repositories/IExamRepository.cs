@@ -8,5 +8,7 @@
         public Task PostExcelAsync(string name, string time, List<IFormFile> privateFileUploads);
         public Task UpdateFileAsync(string newName, int id);
         public Task FileApprove(string check, int id);
+        public Task CreateMultiChoiseExamOnSystem(MultiChoiseExamModel model);
+        public Task CreateEssayExamOnSystem(EssayExamModel model);
     }
 }
