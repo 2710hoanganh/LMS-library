@@ -87,7 +87,7 @@ namespace LMS_library.Controllers
             }
         }
         [HttpPost("excelfile")]
-        public async Task<IActionResult> TestExcelfile(string courseName, string examName,string time, int examNumber, int pointRange, int questionQuantity, int easyQuestionQuantity, int nomalQuestionQuantity, int hardQuestionQuantity)
+        public async Task<IActionResult> ExamFromExistQuestions(string courseName, string examName,string time, int examNumber, int pointRange, int questionQuantity, int easyQuestionQuantity, int nomalQuestionQuantity, int hardQuestionQuantity)
         {
             try
             {

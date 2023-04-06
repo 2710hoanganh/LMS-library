@@ -54,7 +54,7 @@ namespace LMS_library.Repositories
             {
                 role = _contex.Roles.Where(u => u.name.Contains(filter));
             }
-            var result = role.Select(u => new RoleModel
+            var result = role.Select(u => new RoleModel 
             {
                 id = u.id,
                 name = u.name,

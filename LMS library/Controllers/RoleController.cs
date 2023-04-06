@@ -1,6 +1,9 @@
-﻿using LMS_library.Repositories;
+﻿using LMS_library.Data;
+using LMS_library.Repositories;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace LMS_library.Controllers
 {
@@ -10,11 +13,16 @@ namespace LMS_library.Controllers
     public class RoleController : ControllerBase
     {
         private readonly IRoleRepository _repository;
+        private readonly INotificationRepository _notificationRepository;
         private readonly DataDBContex _contex;
-        public RoleController(IRoleRepository repository, DataDBContex contex)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public RoleController(IRoleRepository repository, DataDBContex contex, IHttpContextAccessor httpContextAccessor,INotificationRepository notificationRepository)
         {
+
             _repository = repository;
             _contex = contex;
+            _httpContextAccessor = httpContextAccessor;
+            _notificationRepository= notificationRepository;
         }
 
 
@@ -45,15 +53,25 @@ namespace LMS_library.Controllers
         }
 
         [HttpPost("add-role")]
-        public async Task<IActionResult> AddNewRole(RoleModel model)
+        public async Task<IActionResult> AddNewRole( RoleModel model)
         {
             try
             {
+                var result = _httpContextAccessor!.HttpContext!.User.FindFirstValue(ClaimTypes.Email);
+                var user = await _contex.Users!.FirstOrDefaultAsync(u => u.email == result);
                 if (_contex.Roles.Any(r => r.name == model.name))
                 {
                     return BadRequest("Role already exists .");
                 }
+                var newNoti = new Notification
+                {
+                    message = $"Role {model.name} created successfully",
+                    userId = user.id,
+                    isRead = false,
+                };
                 var newRole = await _repository.AddRoleAsync(model);
+                _contex.Notifications.Add(newNoti);
+                await _contex.SaveChangesAsync();
                 return Ok(newRole);
             }
             catch { return BadRequest(); }
@@ -83,11 +101,22 @@ namespace LMS_library.Controllers
         {
             try
             {
-                if (model.id != id)
+                var result = _httpContextAccessor!.HttpContext!.User.FindFirstValue(ClaimTypes.Email);
+                var user = await _contex.Users!.FirstOrDefaultAsync(u => u.email == result);
+                var role = await _contex.Roles!.FirstOrDefaultAsync(r => r.id == id);
+                if (model.id != id||role ==null)
                 {
                     return NotFound();
                 }
+                var newNoti = new Notification
+                {
+                    message = $"Change {role.name} to {model.name} successfully",
+                    userId = user.id,
+                    isRead = false,
+                };
+                _contex.Notifications.Add(newNoti);
                 await _repository.UpdateRoleAsync(id, model);
+                await _contex.SaveChangesAsync();
                 return Ok("Update Successfully");
             }
             catch

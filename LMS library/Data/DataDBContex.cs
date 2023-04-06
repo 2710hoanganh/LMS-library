@@ -33,5 +33,6 @@ namespace LMS_library.Data
         public DbSet<ResourceList> ResourceLists { get; set; }
         public DbSet<Exam> Exams { get; set; }
         public DbSet<MultipleChoiceQuestions> Questions { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
     }
 }

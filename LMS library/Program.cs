@@ -67,7 +67,7 @@ builder.Services.AddScoped<ILessonRepository, LessonRepository>();
 builder.Services.AddScoped<IResourceRepository, ResourceRepository>();
 builder.Services.AddScoped<IExamRepository, ExamRepository>();
 builder.Services.AddScoped<IQuestionsRepository, QuestionsRepository>();
-
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 
 //Jwt Token Functionality
 //Authentication
