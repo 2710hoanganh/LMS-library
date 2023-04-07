@@ -141,6 +141,7 @@ namespace LMS_library.Controllers
         {
             List<Claim> claims = new List<Claim>
             {
+                new Claim(ClaimTypes.NameIdentifier,user.id.ToString()),
                 new Claim(ClaimTypes.Email, user.email),
                 new Claim(ClaimTypes.Role, role.name),
                 new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),

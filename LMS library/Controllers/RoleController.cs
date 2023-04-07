@@ -1,4 +1,6 @@
-﻿using LMS_library.Data;
+﻿using DocumentFormat.OpenXml.Office2010.Excel;
+using DocumentFormat.OpenXml.Spreadsheet;
+using LMS_library.Data;
 using LMS_library.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -57,21 +59,12 @@ namespace LMS_library.Controllers
         {
             try
             {
-                var result = _httpContextAccessor!.HttpContext!.User.FindFirstValue(ClaimTypes.Email);
-                var user = await _contex.Users!.FirstOrDefaultAsync(u => u.email == result);
                 if (_contex.Roles.Any(r => r.name == model.name))
                 {
                     return BadRequest("Role already exists .");
                 }
-                var newNoti = new Notification
-                {
-                    message = $"Role {model.name} created successfully",
-                    userId = user.id,
-                    isRead = false,
-                };
+                await _notificationRepository.AddNotification($"Role {model.name} create successfully at {DateTime.Now.ToLocalTime}" ,Int32.Parse(UserInfo()), false);
                 var newRole = await _repository.AddRoleAsync(model);
-                _contex.Notifications.Add(newNoti);
-                await _contex.SaveChangesAsync();
                 return Ok(newRole);
             }
             catch { return BadRequest(); }
@@ -83,11 +76,15 @@ namespace LMS_library.Controllers
 
             try
             {
-                var user = await _contex.Users!.FirstOrDefaultAsync(r => r.roleId == id);
-                if (user == null|| user.roleId == id )
+
+                var role = await _contex.Roles!.FindAsync(id);
+                var user = await _contex.Users.ToListAsync();
+                if ( user.Any(u => u.roleId == role.id))
                 {
                     return BadRequest();
                 }
+                await _notificationRepository.AddNotification($"Role {role.name} deleted at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
+
                 await _repository.DeleteRoleAsync(id);
                 return Ok("Delete Success !");
 
@@ -101,22 +98,13 @@ namespace LMS_library.Controllers
         {
             try
             {
-                var result = _httpContextAccessor!.HttpContext!.User.FindFirstValue(ClaimTypes.Email);
-                var user = await _contex.Users!.FirstOrDefaultAsync(u => u.email == result);
                 var role = await _contex.Roles!.FirstOrDefaultAsync(r => r.id == id);
                 if (model.id != id||role ==null)
                 {
                     return NotFound();
                 }
-                var newNoti = new Notification
-                {
-                    message = $"Change {role.name} to {model.name} successfully",
-                    userId = user.id,
-                    isRead = false,
-                };
-                _contex.Notifications.Add(newNoti);
+                await _notificationRepository.AddNotification($"Change {role.name} to {model.name} successfully", Int32.Parse(UserInfo()), false);
                 await _repository.UpdateRoleAsync(id, model);
-                await _contex.SaveChangesAsync();
                 return Ok("Update Successfully");
             }
             catch
@@ -140,8 +128,13 @@ namespace LMS_library.Controllers
             }
         }
 
-
-
+        private string UserInfo()
+        {
+            var result = _httpContextAccessor!.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        
+            return result;
+        }
+        
 
     }
 }

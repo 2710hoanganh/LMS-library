@@ -14,7 +14,7 @@ namespace LMS_library.Repositories
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
         }
-
+      
         public async Task DeleteNotificationAsync(int id)
         {
             var result = _httpContextAccessor!.HttpContext!.User.FindFirstValue(ClaimTypes.Email);
@@ -22,6 +22,19 @@ namespace LMS_library.Repositories
             var delete = await _contex.Notifications!.FindAsync(id);
             if(user.id != delete.userId) { return; }
             _contex.Notifications.Remove(delete);
+            await _contex.SaveChangesAsync();
+        }
+
+
+        public async Task AddNotification(string message, int userId, bool IsRead)
+        {
+            var newNoti = new Notification
+            {
+                message = message,
+                userId = userId,
+                isRead = IsRead,
+            };
+            _contex.Notifications.Add(newNoti);
             await _contex.SaveChangesAsync();
         }
 

@@ -1,6 +1,9 @@
-﻿using LMS_library.Repositories;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using LMS_library.Data;
+using LMS_library.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace LMS_library.Controllers
 {
@@ -13,13 +16,17 @@ namespace LMS_library.Controllers
         private readonly IUserRepository _repository;
         private readonly IUserEditRepository _userEditRepository;
         private readonly IPasswordRepository _passwordRepository;
+        private readonly INotificationRepository _notificationRepository;
         private readonly DataDBContex _contex;
-        public UsersController(IUserRepository repository, DataDBContex contex, IUserEditRepository userEditRepository, IPasswordRepository passwordRepository)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public UsersController(INotificationRepository notificationRepository, IHttpContextAccessor httpContextAccessor, IUserRepository repository, DataDBContex contex, IUserEditRepository userEditRepository, IPasswordRepository passwordRepository)
         {
             _repository = repository;
             _contex = contex;
             _userEditRepository = userEditRepository;
+            _httpContextAccessor = httpContextAccessor;
             _passwordRepository = passwordRepository;
+            _notificationRepository = notificationRepository;
         }
 
 
@@ -82,6 +89,7 @@ namespace LMS_library.Controllers
             {
                 return BadRequest("User already exists .");
             }
+            await _notificationRepository.AddNotification($"{model.email} create successfully with role {model.role}",Int32.Parse(UserInfo()),false);
             var newUser = await _repository.AddUserAsync(model);
             return Ok(newUser);
         }
@@ -91,22 +99,26 @@ namespace LMS_library.Controllers
         [Authorize(Roles = "Admin,Leader")]
         public async Task<IActionResult> DeleteUser([FromRoute] int id)
         {
-
+            var user = await _contex.Users.FindAsync(id);
+            if (user == null) { return BadRequest(); }
+            await _notificationRepository.AddNotification($"{user.email} has been deleted", Int32.Parse(UserInfo()), false);
             await _repository.DeleteUserAsync(id);
             return Ok("Delete Success !");
 
         }
 
         [HttpPut("update/{id}")]
-        [Authorize(Roles = "Admin,Teacher,Student,Leader")]
+        [Authorize(Roles = "Admin,Leader")]
         public async Task<IActionResult> UpdateUser(int id, [FromBody] UserEditModel model)
         {
             try
             {
-                if (model.id != id)
+                var user = await _contex.Users.FindAsync(id);
+                if (model.id != id|| user == null)
                 {
                     return NotFound();
                 }
+                await _notificationRepository.AddNotification($"Change detail {user.email} successfully!", Int32.Parse(UserInfo()), false);
                 await _userEditRepository.UpdateUserAsync(id, model);
                 return Ok("Update Successfully");
             }
@@ -126,6 +138,7 @@ namespace LMS_library.Controllers
                 {
                     return NotFound();
                 }
+                await _notificationRepository.AddNotification($"Change password successfully!", Int32.Parse(UserInfo()), false);
                 await _passwordRepository.ChangePassword(id, model);
                 return Ok("Update Successfully");
             }
@@ -134,6 +147,17 @@ namespace LMS_library.Controllers
                 return BadRequest("Current Password Incorrect !");
             }
         }
+
+
+
+
+        private string UserInfo()
+        {
+            var result = _httpContextAccessor!.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            return result;
+        }
+        
 
     }
 }

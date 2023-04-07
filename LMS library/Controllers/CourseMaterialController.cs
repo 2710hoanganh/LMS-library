@@ -1,8 +1,10 @@
-﻿using LMS_library.Repositories;
+﻿using LMS_library.Data;
+using LMS_library.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MimeKit;
+using System.Security.Claims;
 
 namespace LMS_library.Controllers
 {
@@ -14,12 +16,16 @@ namespace LMS_library.Controllers
     {
 
         private readonly ICourseMaterialRepository _repository;
+        private readonly INotificationRepository _notificationRepository;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly DataDBContex _contex;
 
-        public CourseMaterialController(ICourseMaterialRepository repository, DataDBContex contex)
+        public CourseMaterialController(INotificationRepository notificationRepository, IHttpContextAccessor httpContextAccessor, ICourseMaterialRepository repository, DataDBContex contex)
         {
             _repository = repository;
             _contex = contex;
+            _notificationRepository = notificationRepository;
+            _httpContextAccessor = httpContextAccessor;
         }
 
 
@@ -29,6 +35,7 @@ namespace LMS_library.Controllers
         {
             try
             {
+                await _notificationRepository.AddNotification($"Upload file for {course} successfully at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
                 await _repository.PostMultiFileAsync( type , course, FileUpload);
 
                 return Ok();
@@ -82,7 +89,16 @@ namespace LMS_library.Controllers
                 {
                     return BadRequest("Please Enter Choose Approve Or Reject File");
                 }
-
+                if(check == "Approved")
+                {
+                    await _notificationRepository.AddNotification($"File {file.name} from {file.courses.courseName} approved at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
+                    await _notificationRepository.AddNotification($"Your file {file.name} has been approved at {DateTime.Now.ToLocalTime()}", file.User.id, false);
+                }
+                if(check == "Reject")
+                {
+                    await _notificationRepository.AddNotification($"File {file.name} from {file.courses.courseName} reject at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
+                    await _notificationRepository.AddNotification($"Your file {file.name} has been reject by leader at {DateTime.Now.ToLocalTime()}", file.User.id, false);
+                }
                 await _repository.FileApprove(check, id);
 
                 return Ok("Update Successfully");
@@ -94,6 +110,7 @@ namespace LMS_library.Controllers
         }
 
         [HttpDelete("delete/{id}")]
+        [Authorize(Roles = "Leader,Teacher")]
         public async Task<IActionResult> DeleteFile([FromRoute] int id) // file id 
         {
             try
@@ -102,7 +119,7 @@ namespace LMS_library.Controllers
                 if (file == null) { return NotFound(); }
 
                 System.IO.File.Delete(file.materialPath);
-
+                await _notificationRepository.AddNotification($"File {file.name} deleted at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
                 await _repository.DeleteFileAsync(id);
                 return Ok();
             }
@@ -126,7 +143,7 @@ namespace LMS_library.Controllers
                 {
                     return BadRequest("Please Enter File Name");
                 }
-
+                await _notificationRepository.AddNotification($"File {file.name} has been change to {newName} at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
                 await _repository.UpdateFileAsync(newName, id);
 
                 return Ok("Update Successfully");
@@ -152,7 +169,7 @@ namespace LMS_library.Controllers
                 {
                     return BadRequest("Please Enter File Name");
                 }
-
+                await _notificationRepository.AddNotification($"File {file.name} has been add to {topic} at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
                 await _repository.AddToResource(topic, id);
 
                 return Ok("Update Successfully");
@@ -188,7 +205,7 @@ namespace LMS_library.Controllers
                 }
                 // set the position to return the file from
                 memoryStream.Position = 0;
-
+                await _notificationRepository.AddNotification($"File {file.name} dowloaded at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
                 return File(memoryStream, MimeTypes.GetMimeType(file.materialPath), file.materialPath);
             }
             catch
@@ -212,6 +229,13 @@ namespace LMS_library.Controllers
             {
                 return BadRequest();
             }
+        }
+
+
+        public string UserInfo()
+        {
+            var result = _httpContextAccessor!.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return result;
         }
     }
 }
