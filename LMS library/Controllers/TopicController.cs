@@ -1,7 +1,9 @@
-﻿using LMS_library.Repositories;
+﻿using LMS_library.Data;
+using LMS_library.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace LMS_library.Controllers
 {
@@ -12,10 +14,14 @@ namespace LMS_library.Controllers
     {
         private readonly IMaterialTopicRepository _repository;
         private readonly DataDBContex _contex;
-        public TopicController(IMaterialTopicRepository repository, DataDBContex contex)
+        private readonly INotificationRepository _notificationRepository;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public TopicController(INotificationRepository notificationRepository, IHttpContextAccessor httpContextAccessor, IMaterialTopicRepository repository, DataDBContex contex)
         {
             _repository = repository;
             _contex = contex;
+            _notificationRepository = notificationRepository;
+            _httpContextAccessor = httpContextAccessor;
         }
 
 
@@ -54,6 +60,8 @@ namespace LMS_library.Controllers
                 {
                     return BadRequest("Topic already exists .");
                 }
+                await _notificationRepository.AddNotification($"Topic {model.name} create successfully at {DateTime.Now.ToLocalTime}", Int32.Parse(UserInfo()), false);
+
                 var newTopic = await _repository.AddTopicAsync(model);
                 return Ok(newTopic);
             }
@@ -66,6 +74,9 @@ namespace LMS_library.Controllers
 
             try
             {
+                var topic = await _contex.Topics!.FindAsync(id);
+                if (topic == null) { return NotFound(); }
+                await _notificationRepository.AddNotification($"Topic {topic.name} deleted at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
                 await _repository.DeleteTopicAsync(id);
                 return Ok("Delete Success !");
 
@@ -75,14 +86,17 @@ namespace LMS_library.Controllers
         }
 
         [HttpPut("update/{id}")]
-        public async Task<IActionResult> UpdateRole(int id, [FromBody] TopicModel model)
+        public async Task<IActionResult> UpdateTopic(int id, [FromBody] TopicModel model)
         {
             try
             {
-                if (model.id != id)
+                var topic = await _contex.Topics!.FindAsync(id);
+                if (model.id != id|| topic == null)
                 {
                     return NotFound();
                 }
+                await _notificationRepository.AddNotification($"Change {topic.name} to {model.name} successfully", Int32.Parse(UserInfo()), false);
+
                 await _repository.UpdateTopicAsync(id, model);
                 return Ok("Update Successfully");
             }
@@ -90,6 +104,13 @@ namespace LMS_library.Controllers
             {
                 return BadRequest();
             }
+        }
+
+        private string UserInfo()
+        {
+            var result = _httpContextAccessor!.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            return result;
         }
     }
 }

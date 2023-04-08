@@ -1,6 +1,8 @@
-﻿using LMS_library.Repositories;
+﻿using LMS_library.Data;
+using LMS_library.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace LMS_library.Controllers
 {
@@ -12,10 +14,14 @@ namespace LMS_library.Controllers
 
         private readonly ISystemRepository _repository;
         private readonly DataDBContex _contex;
-        public SystemDetailController(ISystemRepository repository, DataDBContex contex)
+        private readonly INotificationRepository _notificationRepository;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public SystemDetailController(INotificationRepository notificationRepository, IHttpContextAccessor httpContextAccessor, ISystemRepository repository, DataDBContex contex)
         {
             _repository = repository;
             _contex = contex;
+            _notificationRepository = notificationRepository;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         [HttpPost("add-system-detail")]
@@ -28,7 +34,7 @@ namespace LMS_library.Controllers
                 {
                     return BadRequest("System detail already exists .");
                 }
-
+                await _notificationRepository.AddNotification($"System detail created successfully at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
                 var newUDetail = await _repository.AddDetailAsync(model);
                 return Ok(newUDetail);
             }
@@ -56,6 +62,7 @@ namespace LMS_library.Controllers
 
             try
             {
+                await _notificationRepository.AddNotification($"Delete system detail successfully at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
                 await _repository.DeleteDetailAsync(id);
                 return Ok("Delete Success !");
 
@@ -73,6 +80,7 @@ namespace LMS_library.Controllers
                 {
                     return NotFound();
                 }
+                await _notificationRepository.AddNotification($"Update system detail successfully at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
                 await _repository.UpdateDetaiAsync(id, model);
                 return Ok("Update Successfully");
             }
@@ -80,6 +88,13 @@ namespace LMS_library.Controllers
             {
                 return BadRequest();
             }
+        }
+
+
+        private string UserInfo()
+        {
+            var result = _httpContextAccessor!.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return result;
         }
     }
 }
