@@ -1,4 +1,5 @@
-﻿using LMS_library.Repositories;
+﻿using LMS_library.Data;
+using LMS_library.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -17,13 +18,15 @@ namespace LMS_library.Controllers
         private readonly DataDBContex _contex;
         private IHostEnvironment _environment;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly INotificationRepository _notificationRepository;
 
-        public ExamController(IExamRepository repository, DataDBContex contex, IHttpContextAccessor httpContextAccessor, IHostEnvironment environment)
+        public ExamController(INotificationRepository notificationRepository, IExamRepository repository, DataDBContex contex, IHttpContextAccessor httpContextAccessor, IHostEnvironment environment)
         {
             _repository = repository;
             _contex = contex;
             _environment = environment;
             _httpContextAccessor = httpContextAccessor;
+            _notificationRepository = notificationRepository;
         }
 
         [Authorize(Roles = "Leader,Student,Teacher")]
@@ -59,6 +62,12 @@ namespace LMS_library.Controllers
         {
             try
             {
+                var leader = await _contex.Users.Where(l => l.Role.name == "Leader").ToListAsync();
+                foreach (var l in leader)
+                {
+                    await _notificationRepository.AddNotification($"New exam file for {name} upload at {DateTime.Now.ToLocalTime()} please approve/reject the file soon as you can !", l.id, false);
+                }
+                await _notificationRepository.AddNotification($"Upload exam file for {name} successfully at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
                 await _repository.PostWordAsync(name ,time,privateFileUpload);
 
                 return Ok();
@@ -74,6 +83,12 @@ namespace LMS_library.Controllers
         {
             try
             {
+                var leader = await _contex.Users.Where(l => l.Role.name == "Leader").ToListAsync();
+                foreach (var l in leader)
+                {
+                    await _notificationRepository.AddNotification($"New exam file for {name} upload at {DateTime.Now.ToLocalTime()} please approve/reject the file soon as you can !", l.id, false);
+                }
+                await _notificationRepository.AddNotification($"Upload exam file for {name} successfully at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
                 await _repository.PostExcelAsync(name, time, privateFileUpload);
 
                 return Ok();
@@ -108,6 +123,7 @@ namespace LMS_library.Controllers
                 }
                 // set the position to return the file from
                 memoryStream.Position = 0;
+                await _notificationRepository.AddNotification($"Download {file.fileName} successfully at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
 
                 return File(memoryStream, MimeTypes.GetMimeType(file.filePath), file.fileName);
             }
@@ -137,7 +153,7 @@ namespace LMS_library.Controllers
                 }
                 // set the position to return the file from
                 memoryStream.Position = 0;
-
+                await _notificationRepository.AddNotification($"Download {file.fileName} successfully at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
                 return File(memoryStream, MimeTypes.GetMimeType(file.filePath), file.fileName);
             }
             catch
@@ -166,7 +182,7 @@ namespace LMS_library.Controllers
                 {
                     return BadRequest("Please Enter File Name");
                 }
-
+                await _notificationRepository.AddNotification($"Change file name {file.fileName} to {newName} successfully at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
                 await _repository.UpdateFileAsync(newName, id);
 
                 return Ok("Update Successfully");
@@ -192,6 +208,17 @@ namespace LMS_library.Controllers
                 {
                     return BadRequest("Please Enter Choose Approve Or Reject File");
                 }
+                var teacher = await _contex.Users.FirstOrDefaultAsync(u => u.email == file.teacherEmail);
+                if (check == "Approved")
+                {
+                    await _notificationRepository.AddNotification($"File {file.fileName} from {file.courseName} approved at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
+                    await _notificationRepository.AddNotification($"Your file {file.fileName} has been approved at {DateTime.Now.ToLocalTime()}", teacher.id, false);
+                }
+                if (check == "Reject")
+                {
+                    await _notificationRepository.AddNotification($"File {file.fileName} from {file.courseName} reject at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
+                    await _notificationRepository.AddNotification($"Your file {file.fileName} has been reject by leader at {DateTime.Now.ToLocalTime()}", teacher.id, false);
+                }
 
                 await _repository.FileApprove(check, id);
 
@@ -208,7 +235,13 @@ namespace LMS_library.Controllers
         {
             try
             {
-                
+                var leader = await _contex.Users.Where(l => l.Role.name == "Leader").ToListAsync();
+                foreach (var l in leader)
+                {
+                    await _notificationRepository.AddNotification($"New exam file {model.examName} create on system at {DateTime.Now.ToLocalTime()} please approve/reject the file soon as you can !", l.id, false);
+                }
+                await _notificationRepository.AddNotification($"Created exam file for {model.courseName} successfully at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
+
                 await _repository.CreateMultiChoiseExamOnSystem(model);
 
                 return Ok();
@@ -224,6 +257,12 @@ namespace LMS_library.Controllers
         {
             try
             {
+                var leader = await _contex.Users.Where(l => l.Role.name == "Leader").ToListAsync();
+                foreach (var l in leader)
+                {
+                    await _notificationRepository.AddNotification($"New exam file {model.examName} create on system at {DateTime.Now.ToLocalTime()} please approve/reject the file soon as you can !", l.id, false);
+                }
+                await _notificationRepository.AddNotification($"Created exam file for {model.courseName} successfully at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
 
                 await _repository.CreateEssayExamOnSystem(model);
 
@@ -233,6 +272,12 @@ namespace LMS_library.Controllers
             {
                 return BadRequest();
             }
+        }
+
+        private string UserInfo()
+        {
+            var result = _httpContextAccessor!.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return result;
         }
     }
 }

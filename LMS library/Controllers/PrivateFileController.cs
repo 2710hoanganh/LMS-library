@@ -1,4 +1,5 @@
 ﻿
+using LMS_library.Data;
 using LMS_library.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -18,12 +19,17 @@ namespace LMS_library.Controllers
     {
         private readonly IPrivateFileRepository _repository;
         private readonly DataDBContex _contex;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly INotificationRepository _notificationRepository;
 
-        public PrivateFileController(IPrivateFileRepository repository,DataDBContex contex)
+        public PrivateFileController(INotificationRepository notificationRepository, IHttpContextAccessor httpContextAccessor, IPrivateFileRepository repository,DataDBContex contex)
         {
             _repository = repository;
             _contex = contex;
+            _httpContextAccessor = httpContextAccessor;
+            _notificationRepository= notificationRepository;
         }
+
         [HttpGet("list")]
         public async Task<IActionResult> GetAllFile()//get all private file
         {
@@ -46,7 +52,7 @@ namespace LMS_library.Controllers
                 if (file == null){ return NotFound(); }
 
                 System.IO.File.Delete(file.filePath);
-
+                await _notificationRepository.AddNotification($"File {file.fileName} delete successfully at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
                 await _repository.DeleteFileAsync(id);
                 return Ok();
             }
@@ -59,6 +65,7 @@ namespace LMS_library.Controllers
         {
             try
             {
+                await _notificationRepository.AddNotification($"Upload file private successfully at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
                 await _repository.PostMultiFileAsync(privateFileUpload);
 
                 return Ok();
@@ -88,7 +95,7 @@ namespace LMS_library.Controllers
                 }
                 // set the position to return the file from
                 memoryStream.Position = 0;
-                
+                await _notificationRepository.AddNotification($"Download file {file.fileName} successfully at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
                 return File(memoryStream, MimeTypes.GetMimeType(file.filePath), file.fileName);
             }
             catch
@@ -114,7 +121,7 @@ namespace LMS_library.Controllers
                 {
                     return BadRequest("Please Enter File Name");
                 }
-
+                await _notificationRepository.AddNotification($"Change file {file.fileName} to {newName} successfully at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
                 await _repository.UpdateFileAsync(newName, id );
 
                 return Ok("Update Successfully");
@@ -148,6 +155,13 @@ namespace LMS_library.Controllers
             {
                 return BadRequest();
             }
+        }
+
+
+        private string UserInfo()
+        {
+            var result = _httpContextAccessor!.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return result;
         }
     }
 }

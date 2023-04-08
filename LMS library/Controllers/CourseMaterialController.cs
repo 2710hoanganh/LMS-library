@@ -35,6 +35,11 @@ namespace LMS_library.Controllers
         {
             try
             {
+                var leader = await _contex.Users.Where(l => l.Role.name=="Leader").ToListAsync();
+                foreach( var l in leader)
+                {
+                    await _notificationRepository.AddNotification($"New file for {course} upload at {DateTime.Now.ToLocalTime()} please approve/reject the file soon as you can !", l.id, false);
+                }
                 await _notificationRepository.AddNotification($"Upload file for {course} successfully at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
                 await _repository.PostMultiFileAsync( type , course, FileUpload);
 
@@ -232,7 +237,7 @@ namespace LMS_library.Controllers
         }
 
 
-        public string UserInfo()
+        private string UserInfo()
         {
             var result = _httpContextAccessor!.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier);
             return result;

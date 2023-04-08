@@ -15,10 +15,10 @@ namespace LMS_library.Controllers
     public class RoleController : ControllerBase
     {
         private readonly IRoleRepository _repository;
-        private readonly INotificationRepository _notificationRepository;
         private readonly DataDBContex _contex;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        public RoleController(IRoleRepository repository, DataDBContex contex, IHttpContextAccessor httpContextAccessor,INotificationRepository notificationRepository)
+        private readonly INotificationRepository _notificationRepository;
+        public RoleController(INotificationRepository notificationRepository, IRoleRepository repository, DataDBContex contex, IHttpContextAccessor httpContextAccessor)
         {
 
             _repository = repository;

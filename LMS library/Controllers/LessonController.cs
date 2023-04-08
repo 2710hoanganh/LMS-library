@@ -1,6 +1,8 @@
-﻿using LMS_library.Repositories;
+﻿using LMS_library.Data;
+using LMS_library.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace LMS_library.Controllers
 {
@@ -10,10 +12,14 @@ namespace LMS_library.Controllers
     {
         private readonly ILessonRepository _repository;
         private readonly DataDBContex _contex;
-        public LessonController(ILessonRepository repository, DataDBContex contex)
+        private readonly INotificationRepository _notificationRepository;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public LessonController(INotificationRepository notificationRepository, IHttpContextAccessor httpContextAccessor, ILessonRepository repository, DataDBContex contex)
         {
             _repository = repository;
             _contex = contex;
+            _notificationRepository = notificationRepository;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         [HttpGet("list")]
@@ -66,6 +72,7 @@ namespace LMS_library.Controllers
                 {
                     return BadRequest("Lesson already exists .");
                 }
+                await _notificationRepository.AddNotification($"{model.name} create successfully at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
                 var newLesson = await _repository.AddLessonAsync(model);
                 return Ok(newLesson);
             }
@@ -77,13 +84,19 @@ namespace LMS_library.Controllers
 
             try
             {
-
+                var lesson = await _contex.Lessons.FindAsync(id);
+                await _notificationRepository.AddNotification($"{lesson.name} delete successfully at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
                 await _repository.DeleteLessonAsync(id);
                 return Ok("Delete Success !");
 
             }
             catch { return BadRequest(); }
 
+        }
+        private string UserInfo()
+        {
+            var result = _httpContextAccessor!.HttpContext!.User.FindFirstValue(ClaimTypes.Name);
+            return result;
         }
 
     }

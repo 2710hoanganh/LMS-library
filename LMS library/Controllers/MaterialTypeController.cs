@@ -1,7 +1,9 @@
-﻿using LMS_library.Repositories;
+﻿using LMS_library.Data;
+using LMS_library.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace LMS_library.Controllers
 {
@@ -12,10 +14,15 @@ namespace LMS_library.Controllers
     {
         private readonly IMaterialTypeRepository _repository;
         private readonly DataDBContex _contex;
-        public MaterialTypeController(IMaterialTypeRepository repository, DataDBContex contex)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly INotificationRepository _notificationRepository;
+        public MaterialTypeController(INotificationRepository notificationRepository, IHttpContextAccessor httpContextAccessor, IMaterialTypeRepository repository, DataDBContex contex)
         {
-            _repository = repository;
+            _repository = repository;   
+            _httpContextAccessor = httpContextAccessor;
+            _notificationRepository = notificationRepository;
             _contex = contex;
+
         }
 
 
@@ -54,6 +61,7 @@ namespace LMS_library.Controllers
                 {
                     return BadRequest("Material type already exists .");
                 }
+                await _notificationRepository.AddNotification($"Material type {model.name} create successfully at {DateTime.Now.ToLocalTime}", Int32.Parse(UserInfo()), false);
                 var new_type = await _repository.AddMaterialTypeAsync(model);
                 return Ok(new_type);
             }
@@ -67,11 +75,13 @@ namespace LMS_library.Controllers
 
             try
             {
+                var type = await _contex.MaterialTypes.FindAsync(id);
                 var material = await _contex.Materials!.FirstOrDefaultAsync(r => r.materialTypeID == id);
-                if (material?.materialTypeID == id)
+                if (material?.materialTypeID == id || type == null)
                 {
                     return BadRequest();
                 }
+                await _notificationRepository.AddNotification($"Material type {type.name} delete successfully at {DateTime.Now.ToLocalTime}", Int32.Parse(UserInfo()), false);
                 await _repository.DeleteMaterialTypeAsync(id);
                 return Ok("Delete Success !");
 
@@ -86,10 +96,12 @@ namespace LMS_library.Controllers
         {
             try
             {
+                var type = await _contex.MaterialTypes.FindAsync(id);
                 if (model.id != id)
                 {
                     return NotFound();
                 }
+                await _notificationRepository.AddNotification($"Change material type {type.name} to {model.name} successfully", Int32.Parse(UserInfo()), false);
                 await _repository.UpdateMaterialTypeAsync(id, model);
                 return Ok("Update Successfully");
             }
@@ -97,6 +109,12 @@ namespace LMS_library.Controllers
             {
                 return BadRequest();
             }
+        }
+
+        private string UserInfo()
+        {
+            var result = _httpContextAccessor!.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return result;
         }
     }
 }
