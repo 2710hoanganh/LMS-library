@@ -25,5 +25,6 @@ namespace LMS_library.Models
         public int lybraryPhone { get; set; }
         [DefaultValue("example@example.com") ,EmailAddress]
         public string lybraryEmail { get; set; } = string.Empty;
+        public string image { get; set; } = string.Empty;
     }
 }

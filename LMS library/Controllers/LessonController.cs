@@ -95,7 +95,7 @@ namespace LMS_library.Controllers
         }
         private string UserInfo()
         {
-            var result = _httpContextAccessor!.HttpContext!.User.FindFirstValue(ClaimTypes.Name);
+            var result = _httpContextAccessor!.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier);
             return result;
         }
 

@@ -1,4 +1,6 @@
-﻿namespace LMS_library.Repositories
+﻿using System.Diagnostics.Contracts;
+
+namespace LMS_library.Repositories
 {
     public interface IExamRepository
     {
@@ -10,5 +12,6 @@
         public Task FileApprove(string check, int id);
         public Task CreateMultiChoiseExamOnSystem(MultiChoiseExamModel model);
         public Task CreateEssayExamOnSystem(EssayExamModel model);
+        public Task DeleteExamAsyn(int id);
     }
 }

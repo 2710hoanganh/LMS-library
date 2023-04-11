@@ -89,7 +89,7 @@ namespace LMS_library.Controllers
             {
                 return BadRequest("User already exists .");
             }
-            await _notificationRepository.AddNotification($"{model.email} create successfully with role {model.role}",Int32.Parse(UserInfo()),false);
+            await _notificationRepository.AddNotification($"{model.email} create successfully with role {model.role} at {DateTime.Now.ToLocalTime}",Int32.Parse(UserInfo()),false);
             var newUser = await _repository.AddUserAsync(model);
             return Ok(newUser);
         }
@@ -101,8 +101,19 @@ namespace LMS_library.Controllers
         {
             var user = await _contex.Users.FindAsync(id);
             if (user == null) { return BadRequest(); }
-            await _notificationRepository.AddNotification($"{user.email} has been deleted", Int32.Parse(UserInfo()), false);
+            await _notificationRepository.AddNotification($"{user.email} has been deleted at {DateTime.Now.ToLocalTime}", Int32.Parse(UserInfo()), false);
             await _repository.DeleteUserAsync(id);
+            return Ok("Delete Success !");
+
+        }
+        [HttpPut("delete-image/{id}")]
+        [Authorize(Roles = "Admin,Leader,Teacher,Student")]
+        public async Task<IActionResult> DeleteIamge([FromRoute] int id)
+        {
+            var user = await _contex.Users.FindAsync(id);
+            if (user == null) { return BadRequest(); }
+            await _notificationRepository.AddNotification($"Image has been deleted at {DateTime.Now.ToLocalTime}", Int32.Parse(UserInfo()), false);
+            await _repository.DeleteImageAsync(id);
             return Ok("Delete Success !");
 
         }
@@ -118,7 +129,7 @@ namespace LMS_library.Controllers
                 {
                     return NotFound();
                 }
-                await _notificationRepository.AddNotification($"Change detail {user.email} successfully!", Int32.Parse(UserInfo()), false);
+                await _notificationRepository.AddNotification($"Change detail {user.email} successfully at {DateTime.Now.ToLocalTime}", Int32.Parse(UserInfo()), false);
                 await _userEditRepository.UpdateUserAsync(id, model);
                 return Ok("Update Successfully");
             }
@@ -138,7 +149,7 @@ namespace LMS_library.Controllers
                 {
                     return NotFound();
                 }
-                await _notificationRepository.AddNotification($"Change password successfully!", Int32.Parse(UserInfo()), false);
+                await _notificationRepository.AddNotification($"Change password successfully at {DateTime.Now.ToLocalTime}", Int32.Parse(UserInfo()), false);
                 await _passwordRepository.ChangePassword(id, model);
                 return Ok("Update Successfully");
             }
@@ -148,6 +159,38 @@ namespace LMS_library.Controllers
             }
         }
 
+        [HttpPut("upload-image/{id}")]
+        [Authorize(Roles = "Admin,Teacher,Student,Leader")]
+        public async Task<IActionResult> UploadImage(int id, IFormFile formFile)
+        {
+            try
+            {
+
+                await _notificationRepository.AddNotification($"Upload avata successfully at {DateTime.Now.ToLocalTime}", Int32.Parse(UserInfo()), false);
+                await _repository.UploadImage(id, formFile);
+                return Ok("Update Successfully");
+            }
+            catch
+            {
+                return BadRequest("Can not upload");
+            }
+        }
+        [HttpPut("change-image/{id}")]
+        [Authorize(Roles = "Admin,Teacher,Student,Leader")]
+        public async Task<IActionResult> ChangeImage(int id, IFormFile formFile)
+        {
+            try
+            {
+
+                await _notificationRepository.AddNotification($"Change avata successfully at {DateTime.Now.ToLocalTime}", Int32.Parse(UserInfo()), false);
+                await _repository.ChangeImage(id, formFile);
+                return Ok("Update Successfully");
+            }
+            catch
+            {
+                return BadRequest("Can not change image !");
+            }
+        }
 
 
 

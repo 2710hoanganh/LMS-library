@@ -6,6 +6,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using LMS_library.Data;
+using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace LMS_library.Controllers
 {
@@ -36,19 +38,24 @@ namespace LMS_library.Controllers
             }
             var roleId = await _contex.Roles.FirstOrDefaultAsync(r => r.name == request.role);
             if (roleId == null) { return BadRequest("Role not existing"); }
-
-
             //hash password
             HashPassword(request.password
                 , out byte[] passswordHash
                 , out byte[] passwordSalt);
 
+
+            var sex = Data.User.Sex.None;
+            if (request.sex == "Male") { sex = Data.User.Sex.Male; }
+            if (request.sex == "Female") { sex = Data.User.Sex.Female; }
             var user = new User
             {
                 userCode = request.userCode,
                 email = request.email,
                 passwordHash = Convert.ToHexString(passswordHash),
                 passwordSalt = Convert.ToHexString(passwordSalt),
+                sex =  sex,
+                phone = request.phone,
+                address = request.address,
                 roleId = roleId.id,
 
             };

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LMS_library.Migrations
 {
     [DbContext(typeof(DataDBContex))]
-    [Migration("20230331124937_Questions")]
-    partial class Questions
+    [Migration("20230410094324_Systems")]
+    partial class Systems
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -266,6 +266,32 @@ namespace LMS_library.Migrations
                     b.ToTable("Questions");
                 });
 
+            modelBuilder.Entity("LMS_library.Data.Notification", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
+
+                    b.Property<DateTime>("create_At")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("isRead")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("userId")
+                        .HasColumnType("int");
+
+                    b.HasKey("id");
+
+                    b.ToTable("Notifications");
+                });
+
             modelBuilder.Entity("LMS_library.Data.PrivateFiles", b =>
                 {
                     b.Property<int>("id")
@@ -360,6 +386,9 @@ namespace LMS_library.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
 
+                    b.Property<string>("image")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("libraryName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -430,12 +459,19 @@ namespace LMS_library.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
 
+                    b.Property<string>("address")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("firstName")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("image")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("lastName")
@@ -450,6 +486,9 @@ namespace LMS_library.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("phone")
+                        .HasColumnType("int");
+
                     b.Property<string>("resetToken")
                         .HasColumnType("nvarchar(max)");
 
@@ -458,6 +497,9 @@ namespace LMS_library.Migrations
 
                     b.Property<int?>("roleId")
                         .IsRequired()
+                        .HasColumnType("int");
+
+                    b.Property<int>("sex")
                         .HasColumnType("int");
 
                     b.Property<string>("userCode")

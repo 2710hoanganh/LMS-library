@@ -90,7 +90,53 @@ namespace LMS_library.Controllers
             }
         }
 
+        [HttpPut("upload-image/{id}")]
+        [Authorize(Roles = "Admin,Leader")]
+        public async Task<IActionResult> UploadImage(int id, IFormFile formFile)
+        {
+            try
+            {
 
+                await _notificationRepository.AddNotification($"Upload logo for system successfully at {DateTime.Now.ToLocalTime}", Int32.Parse(UserInfo()), false);
+                await _repository.UploadImage(id, formFile);
+                return Ok("Update Successfully");
+            }
+            catch
+            {
+                return BadRequest("Current Password Incorrect !");
+            }
+        }
+        [HttpPut("change-image/{id}")]
+        [Authorize(Roles = "Admin,Teacher,Student,Leader")]
+        public async Task<IActionResult> ChangeImage(int id, IFormFile formFile)
+        {
+            try
+            {
+
+                await _notificationRepository.AddNotification($"Change logo for system successfully at {DateTime.Now.ToLocalTime}", Int32.Parse(UserInfo()), false);
+                await _repository.ChangeImage(id, formFile);
+                return Ok("Update Successfully");
+            }
+            catch
+            {
+                return BadRequest("Current Password Incorrect !");
+            }
+
+        }
+        [HttpPut("delete-image/{id}")]
+        [Authorize(Roles = "Admin,Student")]
+        public async Task<IActionResult> DeleteIamge([FromRoute] int id)
+        {
+            var result = _httpContextAccessor!.HttpContext!.User.FindFirstValue(ClaimTypes.Role);
+            if (result == null || result != "Leader")
+            {
+                return BadRequest();
+            }
+            await _notificationRepository.AddNotification($"System logo has been deleted at {DateTime.Now.ToLocalTime}", Int32.Parse(UserInfo()), false);
+            await _repository.DeleteImageAsync(id);
+            return Ok("Delete Success !");
+
+        }
         private string UserInfo()
         {
             var result = _httpContextAccessor!.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier);

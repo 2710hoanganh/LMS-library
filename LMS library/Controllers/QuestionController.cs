@@ -1,5 +1,4 @@
 ﻿using LMS_library.Data;
-using LMS_library.Migrations;
 using LMS_library.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;

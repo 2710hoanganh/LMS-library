@@ -21,10 +21,10 @@ namespace LMS_library.Repositories
 
         private readonly IMapper _mapper;
         private readonly DataDBContex _contex;
-        private IHostEnvironment _environment;
+        private IWebHostEnvironment _environment;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public QuestionsRepository(IMapper mapper, DataDBContex contex, IHttpContextAccessor httpContextAccessor , IHostEnvironment environment)
+        public QuestionsRepository(IMapper mapper, DataDBContex contex, IHttpContextAccessor httpContextAccessor , IWebHostEnvironment environment)
         {
             _mapper = mapper;
             _contex = contex;
@@ -158,7 +158,7 @@ namespace LMS_library.Repositories
                     .Union(_contex.Questions.Where(q => q.difficultLevel == MultipleChoiceQuestions.DifficultLevel.Hard && q.courseName == courseName).Take(hardQuestionQuantity))
                     .OrderBy(r => EF.Functions.Random()).Take(100);
             }
-            var target = Path.Combine(_environment.ContentRootPath, "Exam File");
+            var target = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\System\Exam");
             if (!Directory.Exists(target))
             {
                 Directory.CreateDirectory(target);

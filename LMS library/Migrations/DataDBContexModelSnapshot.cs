@@ -383,6 +383,9 @@ namespace LMS_library.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
 
+                    b.Property<string>("image")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("libraryName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -453,12 +456,19 @@ namespace LMS_library.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
 
+                    b.Property<string>("address")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("firstName")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("image")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("lastName")
@@ -473,6 +483,9 @@ namespace LMS_library.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("phone")
+                        .HasColumnType("int");
+
                     b.Property<string>("resetToken")
                         .HasColumnType("nvarchar(max)");
 
@@ -481,6 +494,9 @@ namespace LMS_library.Migrations
 
                     b.Property<int?>("roleId")
                         .IsRequired()
+                        .HasColumnType("int");
+
+                    b.Property<int>("sex")
                         .HasColumnType("int");
 
                     b.Property<string>("userCode")
@@ -510,7 +526,7 @@ namespace LMS_library.Migrations
                     b.HasOne("LMS_library.Data.User", "User")
                         .WithMany("materials")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.ClientSetNull)
                         .IsRequired();
 
                     b.HasOne("LMS_library.Data.Course", "courses")

@@ -15,6 +15,9 @@ namespace LMS_library.Models
         public string firstName { get; set; } = null!;
         [DefaultValue("Last Name")]
         public string lastName { get; set; } = null!;
+        public string sex { get; set; }
+        public int phone { get; set; }
+        public string address { get; set; }
         public string role { get; set; } = string.Empty;
     }
 }

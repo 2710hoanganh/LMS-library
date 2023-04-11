@@ -18,6 +18,7 @@ namespace LMS_library.Data
 
         public int lybraryPhone { get; set; } 
         public string lybraryEmail { get; set; } = string.Empty;
+        public string? image { get; set; } = string.Empty;
 
     }
 }

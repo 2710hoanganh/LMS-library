@@ -1,49 +1,50 @@
 ﻿using AutoMapper;
+using DocumentFormat.OpenXml.Office2010.Excel;
 using System.Security.Claims;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace LMS_library.Repositories
 {
-    public class CourseMaterialRepository :ICourseMaterialRepository
+    public class CourseMaterialRepository : ICourseMaterialRepository
     {
         private readonly DataDBContex _contex;
-        private IHostEnvironment _environment;
+        private IWebHostEnvironment _environment;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IMapper _mapper;
 
 
 
-        public CourseMaterialRepository(DataDBContex contex, IMapper mapper, IHostEnvironment environment, IHttpContextAccessor httpContextAccessor) 
+        public CourseMaterialRepository(DataDBContex contex, IMapper mapper, IWebHostEnvironment environment, IHttpContextAccessor httpContextAccessor)
         {
             _contex = contex;
             _mapper = mapper;
             _environment = environment;
             _httpContextAccessor = httpContextAccessor;
         }
-        public async Task PostMultiFileAsync( string type , string course ,List<IFormFile> MaterialUploads)// type = material file type (Lesson or Resource) , course = course name
+        public async Task PostMultiFileAsync(string type, string course, List<IFormFile> MaterialUploads)// type = material file type (Lesson or Resource) , course = course name
         {
             var result = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email);
             if (result == null)
             {
                 return;
             }
-            int courseID =0 ;
+            int courseID = 0;
             var user = await _contex.Users.FirstOrDefaultAsync(u => u.email == result);
             var materialType = await _contex.MaterialTypes.FirstOrDefaultAsync(t => t.name == type);
-            var courseName = await _contex.Courses.FirstOrDefaultAsync(c => c.courseName== course);
-            if(courseName ==null)
+            var courseName = await _contex.Courses.FirstOrDefaultAsync(c => c.courseName == course);
+            if (courseName == null)
             {
                 courseID = 0;
             }
 
-            if(courseName != null )
+            if (courseName != null)
             {
                 courseID = courseName.id;
 
             }
-            
-            var target = Path.Combine(_environment.ContentRootPath, "Course Material");
+
+            var target = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\System\Course Material");
             if (!Directory.Exists(target))
             {
                 Directory.CreateDirectory(target);
@@ -80,8 +81,7 @@ namespace LMS_library.Repositories
                 .ToListAsync();
             return _mapper.Map<List<CourseMaterial>>(files);
         }
-        public async Task<List<CourseMaterial>> GetAll(int id) //course id
-
+        public async Task<List<CourseMaterial>> GetAllBaseOnCourse(int id) //course id
         {
 
             var files = await _contex.Materials!
@@ -89,9 +89,34 @@ namespace LMS_library.Repositories
                 .ToListAsync();
             return _mapper.Map<List<CourseMaterial>>(files);
         }
+        public async Task<List<CourseMaterial>> GetAll() //all material by teacher
+        {
+            var result = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var files = await _contex.Materials!
+                .Where(f => f.UserId == Int32.Parse(result))
+                .ToListAsync();
+            return _mapper.Map<List<CourseMaterial>>(files);
+        }
+        public async Task<List<CourseMaterial>> GetAllLesson()
+        {
+            var result = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var files = await _contex.Materials!
+                .Where(f => f.UserId == Int32.Parse(result) && f.MaterialType.Equals("Lesson"))
+                .ToListAsync();
+            return _mapper.Map<List<CourseMaterial>>(files);
+        }
+        public async Task<List<CourseMaterial>> GetAllResource() 
+        {
+            var result = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var files = await _contex.Materials!
+                .Where(f => f.UserId == Int32.Parse(result) && f.MaterialType.Equals("Resource"))
+                .ToListAsync();
+            return _mapper.Map<List<CourseMaterial>>(files);
+        }
+
         public async Task UpdateFileAsync(string newName, int id)// new file name and material id
         {
-            var target = Path.Combine(_environment.ContentRootPath, "Course Material");
+            var target = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\System\Course Material");
             var material = await _contex.Materials!.FindAsync(id);
             if (material == null) { return; }
             //file change Name

@@ -10,11 +10,11 @@ namespace LMS_library.Repositories
     {
 
         private readonly DataDBContex _contex;
-        private IHostEnvironment _environment;
+        private IWebHostEnvironment _environment;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IMapper _mapper;   
 
-        public PrivateFileRepository(DataDBContex contex, IMapper mapper , IHostEnvironment environment, IHttpContextAccessor httpContextAccessor)
+        public PrivateFileRepository(DataDBContex contex, IMapper mapper , IWebHostEnvironment environment, IHttpContextAccessor httpContextAccessor)
         {
             _contex = contex;
             _mapper = mapper;
@@ -29,7 +29,8 @@ namespace LMS_library.Repositories
                 return;
             }
             var user = await _contex.Users.FirstOrDefaultAsync(u => u.email == result);
-            var target = Path.Combine(_environment.ContentRootPath, "Private File");
+
+            var target = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\System\Private File");
             if (!Directory.Exists(target))
             {
                 Directory.CreateDirectory(target);
@@ -60,7 +61,8 @@ namespace LMS_library.Repositories
         }
         public async Task<List<PrivateFiles>> GetAll()
         {
-            var files = await _contex.PrivateFiles!.ToListAsync();
+            var result = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var files = await _contex.PrivateFiles!.Where(f => f.userId == Int32.Parse(result)).ToListAsync();
             return _mapper.Map<List<PrivateFiles>>(files);
         }
         public async Task DeleteFileAsync(int id)
@@ -75,8 +77,9 @@ namespace LMS_library.Repositories
         public async Task UpdateFileAsync(string newName, int id) //newName = new file name + file id
         {
 
-                var target = Path.Combine(_environment.ContentRootPath, "Private File");
-                var file = await _contex.PrivateFiles!.FindAsync(id);
+
+            var target = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\System\Private File");
+            var file = await _contex.PrivateFiles!.FindAsync(id);
                 if (file == null) { return; }
             //file change Name
                 string FileName = newName + file.fileType;

@@ -65,19 +65,57 @@ namespace LMS_library.Controllers
             }
         }
         [Authorize(Roles = "Leader,Teacher")]
-        [HttpGet("list")]
-        public async Task<IActionResult> GetAllFile(int id)//course id  , student cant see the pendding or reject file ,ONLY SEE THE FILE BEEN APPROVED
+        [HttpGet("list-course-material")]
+        public async Task<IActionResult> GetAllFile(int id)//course id  , 
         {
             try
             {
-                return Ok(await _repository.GetAll(id));
+                return Ok(await _repository.GetAllBaseOnCourse(id));
             }
             catch
             {
                 return BadRequest();
             }
         }
-
+        [Authorize(Roles = "Leader,Teacher")]
+        [HttpGet("list-course-material")]
+        public async Task<IActionResult> GetAllResource()//course id  , 
+        {
+            try
+            {
+                return Ok(await _repository.GetAllResource());
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+        [Authorize(Roles = "Leader,Teacher")]
+        [HttpGet("list-course-material")]
+        public async Task<IActionResult> Getall()//course id  , 
+        {
+            try
+            {
+                return Ok(await _repository.GetAll());
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+        [Authorize(Roles = "Leader,Teacher")]
+        [HttpGet("list-course-material")]
+        public async Task<IActionResult> GetAllLesson()//course id  , 
+        {
+            try
+            {
+                return Ok(await _repository.GetAllLesson());
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
 
         [Authorize(Roles = "Leader")]
         [HttpPut("approve/{id}")]

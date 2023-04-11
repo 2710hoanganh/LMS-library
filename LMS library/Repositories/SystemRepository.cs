@@ -1,4 +1,7 @@
 ﻿using AutoMapper;
+using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
+using LMS_library.Data;
+using Microsoft.AspNetCore.Http;
 
 namespace LMS_library.Repositories
 {
@@ -7,11 +10,13 @@ namespace LMS_library.Repositories
 
         private readonly IMapper _mapper;
         private readonly DataDBContex _contex;
+        private IWebHostEnvironment _webHostEnvironment;
 
-        public SystemRepository(IMapper mapper, DataDBContex contex)
+        public SystemRepository(IMapper mapper, DataDBContex contex, IWebHostEnvironment webHostEnvironment)
         {
             _mapper = mapper;
             _contex = contex;
+            _webHostEnvironment= webHostEnvironment;
         }
         public async Task<string> AddDetailAsync(SystemModel model)
         {
@@ -54,6 +59,84 @@ namespace LMS_library.Repositories
                 _contex.System?.Update(updateDetail);
                 await _contex.SaveChangesAsync();
             }
+        }
+
+
+
+        public async  Task UploadImage(int id,IFormFile file)
+        {
+            var detail = await _contex.System!.FindAsync(id);
+            if (detail == null ) { return; }
+            var target = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\System\Avata");
+            if (!Directory.Exists(target))
+            {
+                Directory.CreateDirectory(target);
+            }
+            var filePath = Path.Combine(target, file.FileName);
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            detail.schoolName = detail.schoolName;
+            detail.schoolWebSite = detail.schoolWebSite;
+            detail.shoolType = detail.shoolType;
+            detail.principal = detail.principal;
+            detail.libraryName = detail.libraryName;
+            detail.lybraryWebSite = detail.lybraryWebSite;
+            detail.lybraryPhone = detail.lybraryPhone;
+            detail.lybraryEmail = detail.lybraryEmail;
+            detail.image = filePath;
+            var updateDetail = _mapper.Map<SystemDetail>(detail);
+            _contex.System?.Update(updateDetail);
+            await _contex.SaveChangesAsync();
+        }
+
+        public async Task ChangeImage(int id,IFormFile file)
+        {
+            var detail = await _contex.System!.FindAsync(id);
+            if (detail == null) { return; }
+            var target = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\System\Avata");
+            if (!Directory.Exists(target))
+            {
+                Directory.CreateDirectory(target);
+            }
+            var filePath = Path.Combine(target, file.FileName);
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+            System.IO.File.Delete(detail.image);
+            detail.schoolName = detail.schoolName;
+            detail.schoolWebSite = detail.schoolWebSite;
+            detail.shoolType = detail.shoolType;
+            detail.principal = detail.principal;
+            detail.libraryName = detail.libraryName;
+            detail.lybraryWebSite = detail.lybraryWebSite;
+            detail.lybraryPhone = detail.lybraryPhone;
+            detail.lybraryEmail = detail.lybraryEmail;
+            detail.image = filePath;
+            var updateDetail = _mapper.Map<SystemDetail>(detail);
+            _contex.System?.Update(updateDetail);
+            await _contex.SaveChangesAsync(); 
+        }
+        public async Task DeleteImageAsync(int id)
+        {
+            var detail = await _contex.System!.FindAsync(id);
+            if (detail == null) { return; }
+            System.IO.File.Delete(detail.image);
+            detail.schoolName = detail.schoolName;
+            detail.schoolWebSite = detail.schoolWebSite;
+            detail.shoolType = detail.shoolType;
+            detail.principal = detail.principal;
+            detail.libraryName = detail.libraryName;
+            detail.lybraryWebSite = detail.lybraryWebSite;
+            detail.lybraryPhone = detail.lybraryPhone;
+            detail.lybraryEmail = detail.lybraryEmail;
+            detail.image = null;
+            var updateDetail = _mapper.Map<SystemDetail>(detail);
+            _contex.System?.Update(updateDetail);
+            await _contex.SaveChangesAsync(); throw new NotImplementedException();
         }
     }
 }

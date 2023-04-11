@@ -6,7 +6,6 @@ using OfficeOpenXml;
 using Microsoft.Office.Interop.Excel;
 using System.Runtime.InteropServices;
 using ClosedXML.Excel;
-using LMS_library.Migrations;
 using System.Drawing.Printing;
 using DocumentFormat.OpenXml.Wordprocessing;
 using DocumentFormat.OpenXml.Packaging;
@@ -20,11 +19,11 @@ namespace LMS_library.Repositories
     public class ExamRepository : IExamRepository
     {
         private readonly DataDBContex _contex;
-        private IHostEnvironment _environment;
+        private IWebHostEnvironment _environment;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IMapper _mapper;
 
-        public ExamRepository(DataDBContex contex, IMapper mapper, IHostEnvironment environment, IHttpContextAccessor httpContextAccessor)
+        public ExamRepository(DataDBContex contex, IMapper mapper, IWebHostEnvironment environment, IHttpContextAccessor httpContextAccessor)
         {
             _contex = contex;
             _mapper = mapper;
@@ -46,7 +45,7 @@ namespace LMS_library.Repositories
             {
                 return;
             }
-            var target = Path.Combine(_environment.ContentRootPath, "Exam File");
+            var target = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\System\Exam");
             if (!Directory.Exists(target))
             {
                 Directory.CreateDirectory(target);
@@ -92,7 +91,7 @@ namespace LMS_library.Repositories
             {
                 return;
             }
-            var target = Path.Combine(_environment.ContentRootPath, "Exam File");
+            var target = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\System\Exam");
             if (!Directory.Exists(target))
             {
                 Directory.CreateDirectory(target);
@@ -206,7 +205,7 @@ namespace LMS_library.Repositories
             {
                 return ;
             }
-            var target = Path.Combine(_environment.ContentRootPath, "Exam File");
+            var target = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\System\Exam");
             if (!Directory.Exists(target))
             {
                 Directory.CreateDirectory(target);
@@ -276,7 +275,7 @@ namespace LMS_library.Repositories
             {
                 return;
             }
-            var target = Path.Combine(_environment.ContentRootPath, "Exam File");
+            var target = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\System\Exam");
             if (!Directory.Exists(target))
             {
                 Directory.CreateDirectory(target);
@@ -317,6 +316,14 @@ namespace LMS_library.Repositories
 
             }
 
+        }
+
+        public async Task DeleteExamAsyn(int id)
+        {
+            var exam = await _contex.Exams!.FindAsync(id);
+            if (exam == null) { return; }
+            _contex.Exams?.Remove(exam);
+            await _contex.SaveChangesAsync();
         }
     }
 }

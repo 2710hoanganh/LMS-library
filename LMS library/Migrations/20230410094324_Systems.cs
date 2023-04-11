@@ -6,11 +6,32 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace LMS_library.Migrations
 {
     /// <inheritdoc />
-    public partial class System : Migration
+    public partial class Systems : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Exams",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    fileType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    fileName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    filePath = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    courseName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    teacherEmail = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    examType = table.Column<int>(type: "int", nullable: false),
+                    time = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    examStatus = table.Column<int>(type: "int", nullable: false),
+                    create_At = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Exams", x => x.id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "MaterialTypes",
                 columns: table => new
@@ -22,6 +43,45 @@ namespace LMS_library.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_MaterialTypes", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Notifications",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    message = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    userId = table.Column<int>(type: "int", nullable: false),
+                    isRead = table.Column<bool>(type: "bit", nullable: false),
+                    create_At = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Notifications", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Questions",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    difficultLevel = table.Column<int>(type: "int", nullable: false),
+                    courseName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    teacherEmail = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    questionName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    answerA = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    answerB = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    answerC = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    answerD = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    correctAnswer = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    create_At = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    update_At = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Questions", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
@@ -53,7 +113,8 @@ namespace LMS_library.Migrations
                     libraryName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     lybraryWebSite = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     lybraryPhone = table.Column<int>(type: "int", nullable: false),
-                    lybraryEmail = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    lybraryEmail = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    image = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -70,6 +131,10 @@ namespace LMS_library.Migrations
                     email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     firstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     lastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    image = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    sex = table.Column<int>(type: "int", nullable: false),
+                    phone = table.Column<int>(type: "int", nullable: false),
+                    address = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     passwordHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     passwordSalt = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     roleId = table.Column<int>(type: "int", nullable: false),
@@ -324,7 +389,16 @@ namespace LMS_library.Migrations
                 table: "Lessons");
 
             migrationBuilder.DropTable(
+                name: "Exams");
+
+            migrationBuilder.DropTable(
+                name: "Notifications");
+
+            migrationBuilder.DropTable(
                 name: "PrivateFiles");
+
+            migrationBuilder.DropTable(
+                name: "Questions");
 
             migrationBuilder.DropTable(
                 name: "System");

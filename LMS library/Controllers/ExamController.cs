@@ -273,6 +273,23 @@ namespace LMS_library.Controllers
                 return BadRequest();
             }
         }
+        [HttpDelete("delete/{id}")]
+        [Authorize(Roles = "Leader,Teacher")]
+        public async Task<IActionResult> DeleteFile([FromRoute] int id) // file id 
+        {
+            try
+            {
+                var file = await _contex.Exams.FirstOrDefaultAsync(u => u.id == id);
+                if (file == null) { return NotFound(); }
+
+                System.IO.File.Delete(file.filePath);
+                await _notificationRepository.AddNotification($"Exam {file.fileName} deleted at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
+                await _repository.DeleteExamAsyn(id);
+                return Ok();
+            }
+            catch { return BadRequest(); }
+
+        }
 
         private string UserInfo()
         {

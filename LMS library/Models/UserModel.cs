@@ -15,6 +15,13 @@ namespace LMS_library.Models
         public string firstName { get; set; } = null!;
         [DefaultValue("Last Name")]
         public string lastName { get; set; } = null!;
+        public string image { get; set; }
+        public string sex { get; set; }
+        [DefaultValue(0123456789)]
+        public int phone { get; set; }
+        [DefaultValue("Alta soft ware")]
+        public string address { get; set; }
+
         [Required, MinLength(6, ErrorMessage = "Please enter at least 6 character"), MaxLength(25)]
         public string password { get; set; } = string.Empty;
         [Required, Compare("password")]
