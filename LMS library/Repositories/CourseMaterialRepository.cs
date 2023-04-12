@@ -81,6 +81,14 @@ namespace LMS_library.Repositories
                 .ToListAsync();
             return _mapper.Map<List<CourseMaterial>>(files);
         }
+        public async Task<List<CourseMaterial>> GetAll()// course id
+        {
+
+            var files = await _contex.Materials!
+                .ToListAsync();
+            return _mapper.Map<List<CourseMaterial>>(files);
+        }
+
         public async Task<List<CourseMaterial>> GetAllBaseOnCourse(int id) //course id
         {
 
@@ -89,7 +97,8 @@ namespace LMS_library.Repositories
                 .ToListAsync();
             return _mapper.Map<List<CourseMaterial>>(files);
         }
-        public async Task<List<CourseMaterial>> GetAll() //all material by teacher
+
+        public async Task<List<CourseMaterial>> GetAllForTeacher() //all material by teacher
         {
             var result = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var files = await _contex.Materials!
@@ -97,6 +106,7 @@ namespace LMS_library.Repositories
                 .ToListAsync();
             return _mapper.Map<List<CourseMaterial>>(files);
         }
+        
         public async Task<List<CourseMaterial>> GetAllLesson()
         {
             var result = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -105,6 +115,7 @@ namespace LMS_library.Repositories
                 .ToListAsync();
             return _mapper.Map<List<CourseMaterial>>(files);
         }
+
         public async Task<List<CourseMaterial>> GetAllResource() 
         {
             var result = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -132,7 +143,6 @@ namespace LMS_library.Repositories
             material.submission_date = material.submission_date;
             material.fileStatus = material.fileStatus;
             material.courseId = material.courseId;
-            material.resourceId = material.resourceId;
             material.UserId = material.UserId;
    
             _contex.Materials.Update(material);
@@ -171,7 +181,6 @@ namespace LMS_library.Repositories
                 material.submission_date = material.submission_date;
                 material.fileStatus = status;
                 material.UserId = material.UserId;
-                material.resourceId = material.resourceId;
                 material.courseId = material.courseId;
                 _contex.Materials.Update(material);
                 await _contex.SaveChangesAsync();
@@ -196,7 +205,6 @@ namespace LMS_library.Repositories
             material.fileStatus= material.fileStatus;
             material.courseId = material.courseId;
             material.UserId = material.UserId;
-            material.resourceId = resource.id;
             _contex.Materials.Update(material);
             await _contex.SaveChangesAsync();
         }

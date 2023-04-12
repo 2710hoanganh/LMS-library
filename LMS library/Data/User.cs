@@ -30,7 +30,7 @@ namespace LMS_library.Data
         public string address { get; set; } = string.Empty;
         public string passwordHash { get; set; } = string.Empty;
         public string passwordSalt { get; set; } = string.Empty;
-        public int? roleId { get; set; }
+        public int roleId { get; set; }
         [ForeignKey("roleId")]
         public Role Role { get; set; }
 

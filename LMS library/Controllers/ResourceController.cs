@@ -50,12 +50,23 @@ namespace LMS_library.Controllers
         }
 
         [HttpPost("add-resource")]
-        public async Task<IActionResult> AddNewRole(ResourceModel model)
+        public async Task<IActionResult> AddNewResource(ResourceModel model)
         {
             try
             {
                 await _notificationRepository.AddNotification($"Resource added successfully for {model.lessonName} at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
-                var newResource = await _repository.AddRessourceAsync(model);
+                var newResource = await _repository.AddResourceAsync(model);
+                return Ok(newResource);
+            }
+            catch { return BadRequest(); }
+        }
+        [HttpPost("add-resource-and-upload-file")]
+        public async Task<IActionResult> AddNewReourceAndUploadFile(string course , string topic ,string lesson ,IFormFile formFile)
+        {
+            try
+            {
+                await _notificationRepository.AddNotification($"Resource added successfully for {lesson} at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
+                var newResource = await _repository.AddResourceAndUploadFileAsync(course , topic,lesson,formFile);
                 return Ok(newResource);
             }
             catch { return BadRequest(); }
@@ -67,6 +78,7 @@ namespace LMS_library.Controllers
             try
             {
                 var resource = await _contex.ResourceLists!.FindAsync(id);
+                if (resource == null) { return BadRequest(); }
                 await _notificationRepository.AddNotification($"Resource of {resource.Lesson.name} deleted at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
                 await _repository.Delete(id);
                 return Ok("Delete Success !");
@@ -103,6 +115,7 @@ namespace LMS_library.Controllers
             {
                 var file = await _contex.Materials!.FirstOrDefaultAsync(u => u.id == id);
                 var fileType = await _contex.MaterialTypes.FirstOrDefaultAsync(u => u.name == "Resource");
+                if (fileType == null || file ==null) { return BadRequest(); }
                 if (file.materialTypeID != fileType.id)
                 {
                     return BadRequest(" File type must be resource not lesson ! ");
@@ -135,7 +148,7 @@ namespace LMS_library.Controllers
         {
             try
             {
-                var file = await _contex.Materials.FirstOrDefaultAsync(u => u.resourceId == id);
+                var file = await _contex.ResourceLists.FirstOrDefaultAsync(u => u.id == id);
                 if (file == null)
                 {
                     return NotFound();
@@ -143,14 +156,14 @@ namespace LMS_library.Controllers
                 // create a memorystream
                 var memoryStream = new MemoryStream();
 
-                using (var stream = new FileStream(file.materialPath, FileMode.Open))
+                using (var stream = new FileStream(file.Material.materialPath, FileMode.Open))
                 {
                     await stream.CopyToAsync(memoryStream);
                 }
                 // set the position to return the file from
                 memoryStream.Position = 0;
-                await _notificationRepository.AddNotification($"Download resource file at {DateTime.Now.ToLocalTime()},file name is {file.name}", Int32.Parse(UserInfo()), false);
-                return File(memoryStream, MimeTypes.GetMimeType(file.materialPath), file.materialPath);
+                await _notificationRepository.AddNotification($"Download resource file at {DateTime.Now.ToLocalTime()},file name is {file.Material.name}", Int32.Parse(UserInfo()), false);
+                return File(memoryStream, MimeTypes.GetMimeType(file.Material.materialPath), file.Material.materialPath);
             }
             catch
             {

@@ -74,7 +74,14 @@ namespace LMS_library.Controllers
             try
             {
                 var course = await _repository.GetById(id);
-                return course == null ? NotFound() : Ok(course);
+                return course == null ? NotFound() : Ok(new
+                {
+                   course.courseCode,
+                   course.courseName,
+                   course.User.email,
+                   course.description,
+                   course.topics,
+                });
             }
             catch { return BadRequest(); }
 

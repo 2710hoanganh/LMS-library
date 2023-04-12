@@ -78,13 +78,29 @@ namespace LMS_library.Controllers
             }
             catch { return BadRequest(); }
         }
+        [HttpPost("add-lesson-and-upload-file")]
+        public async Task<IActionResult> AddLessonAndUploadFile(string course , string topic , string title , IFormFile formFile)
+        {
+            try
+            {
+                if (_contex.Lessons.Any(r => r.name == title))
+                {
+                    return BadRequest("Lesson already exists .");
+                }
+                await _notificationRepository.AddNotification($"{title} create successfully and upload {formFile.FileName} for review successfully at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
+                var newLesson = await _repository.AddLessonAndUploadFileAsync(course , topic,title,formFile);
+                return Ok(newLesson);
+            }
+            catch { return BadRequest(); }
+        }
         [HttpDelete("delete/{id}")]
-        public async Task<IActionResult> DeleteRol([FromRoute] int id)
+        public async Task<IActionResult> Delete([FromRoute] int id)
         {
 
             try
             {
                 var lesson = await _contex.Lessons.FindAsync(id);
+                if (lesson == null) {return BadRequest();}  
                 await _notificationRepository.AddNotification($"{lesson.name} delete successfully at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
                 await _repository.DeleteLessonAsync(id);
                 return Ok("Delete Success !");

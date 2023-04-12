@@ -9,8 +9,9 @@ namespace LMS_library.Data
         public int id { get; set; }
         [Required]
         public int lessonId { get; set; }
+        public int materialId { get; set; }
         public Lesson Lesson { get; set; }
-        public ICollection<CourseMaterial> CourseMaterial { get; set; }
+        public CourseMaterial Material { get; set; }
 
     }
 }

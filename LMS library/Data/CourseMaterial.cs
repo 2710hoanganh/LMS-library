@@ -28,15 +28,12 @@ namespace LMS_library.Data
         [ForeignKey("courseId")]
 
         public Course courses { get; set; }
-        public int? resourceId { get; set; }
-        [ForeignKey("resourceId")]
-        public ResourceList ResourceList { get; set; }
         public FileStatus fileStatus { get; set; }
         public string materialPath { get; set; }
         public int fileSize { get; set; }
 
         public DateTime submission_date { get; set; }
-
+        public ResourceList ResourceList { get; set; }
         public  Lesson Lesson { get; set; }
 
 

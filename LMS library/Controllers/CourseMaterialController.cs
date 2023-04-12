@@ -64,9 +64,22 @@ namespace LMS_library.Controllers
                 return BadRequest();
             }
         }
+        [Authorize(Roles = "Leader")]
+        [HttpGet("list-course-material")]
+        public async Task<IActionResult> GetAllFile()//course id  , 
+        {
+            try
+            {
+                return Ok(await _repository.GetAll();
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
         [Authorize(Roles = "Leader,Teacher")]
         [HttpGet("list-course-material")]
-        public async Task<IActionResult> GetAllFile(int id)//course id  , 
+        public async Task<IActionResult> GetAllCourseFile(int id)//course id  , 
         {
             try
             {
@@ -78,7 +91,7 @@ namespace LMS_library.Controllers
             }
         }
         [Authorize(Roles = "Leader,Teacher")]
-        [HttpGet("list-course-material")]
+        [HttpGet("list-resource")]
         public async Task<IActionResult> GetAllResource()//course id  , 
         {
             try
@@ -91,12 +104,12 @@ namespace LMS_library.Controllers
             }
         }
         [Authorize(Roles = "Leader,Teacher")]
-        [HttpGet("list-course-material")]
-        public async Task<IActionResult> Getall()//course id  , 
+        [HttpGet("list-course-material-teacher")]
+        public async Task<IActionResult> GetallForTeahcher()//course id  , 
         {
             try
             {
-                return Ok(await _repository.GetAll());
+                return Ok(await _repository.GetAllForTeacher());
             }
             catch
             {
@@ -104,7 +117,7 @@ namespace LMS_library.Controllers
             }
         }
         [Authorize(Roles = "Leader,Teacher")]
-        [HttpGet("list-course-material")]
+        [HttpGet("list-lesson")]
         public async Task<IActionResult> GetAllLesson()//course id  , 
         {
             try
