@@ -72,13 +72,14 @@ namespace LMS_library.Controllers
                 {
                     return BadRequest("Lesson already exists .");
                 }
-                await _notificationRepository.AddNotification($"{model.name} create successfully at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
+                await _notificationRepository.AddNotification($"New lesson {model.name} create successfully at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
                 var newLesson = await _repository.AddLessonAsync(model);
                 return Ok(newLesson);
             }
             catch { return BadRequest(); }
         }
         [HttpPost("add-lesson-and-upload-file")]
+        [DisableRequestSizeLimit]
         public async Task<IActionResult> AddLessonAndUploadFile(string course , string topic , string title , IFormFile formFile)
         {
             try
@@ -87,7 +88,7 @@ namespace LMS_library.Controllers
                 {
                     return BadRequest("Lesson already exists .");
                 }
-                await _notificationRepository.AddNotification($"{title} create successfully and upload {formFile.FileName} for review successfully at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
+                await _notificationRepository.AddNotification($"New lesson {title} create successfully and upload {formFile.FileName} for review successfully at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
                 var newLesson = await _repository.AddLessonAndUploadFileAsync(course , topic,title,formFile);
                 return Ok(newLesson);
             }
@@ -101,7 +102,7 @@ namespace LMS_library.Controllers
             {
                 var lesson = await _contex.Lessons.FindAsync(id);
                 if (lesson == null) {return BadRequest();}  
-                await _notificationRepository.AddNotification($"{lesson.name} delete successfully at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
+                await _notificationRepository.AddNotification($"Lesson {lesson.name} delete successfully at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
                 await _repository.DeleteLessonAsync(id);
                 return Ok("Delete Success !");
 

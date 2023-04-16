@@ -28,6 +28,7 @@ namespace LMS_library.Repositories
                 .FirstOrDefaultAsync(t => t.name == model.topicName && t.courses.courseName == model.courseName);
             var material = await _contex.Materials
                 .FirstOrDefaultAsync(m => m.name == model.materialName && m.MaterialType.name.Equals("Lesson")&& m.Lesson ==null);
+            var type = await _contex.MaterialTypes!.FirstOrDefaultAsync(t => t.id == material!.materialTypeID);
             if(topic == null ||material ==null) 
             {
                 return ("Cant find topic or material");
@@ -36,7 +37,7 @@ namespace LMS_library.Repositories
             {
                 return ("Material file not approved");
             } 
-            if(material.MaterialType.name != "Lesson")
+            if(type.name != "Lesson")
             {
                 return ("Material type must be lesson !");
             }
@@ -156,7 +157,7 @@ namespace LMS_library.Repositories
 
         private string UserInfo()
         {
-            var result = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var result = _httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier);
             return result;
         }
     }

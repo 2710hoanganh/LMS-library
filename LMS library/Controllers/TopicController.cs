@@ -60,15 +60,15 @@ namespace LMS_library.Controllers
                 {
                     return BadRequest("Topic already exists .");
                 }
-                await _notificationRepository.AddNotification($"Topic {model.name} create successfully at {DateTime.Now.ToLocalTime}", Int32.Parse(UserInfo()), false);
+                    await _notificationRepository.AddNotification($"Topic {model.name} create successfully at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
 
-                var newTopic = await _repository.AddTopicAsync(model);
-                return Ok(newTopic);
+                    var newTopic = await _repository.AddTopicAsync(model);
+                    return Ok(newTopic);
+                }
+                catch { return BadRequest(); }
             }
-            catch { return BadRequest(); }
-        }
 
-        [HttpDelete("delete/{id}")]
+            [HttpDelete("delete/{id}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
 
@@ -95,7 +95,7 @@ namespace LMS_library.Controllers
                 {
                     return NotFound();
                 }
-                await _notificationRepository.AddNotification($"Change {topic.name} to {model.name} successfully", Int32.Parse(UserInfo()), false);
+                await _notificationRepository.AddNotification($"Change topic name {topic.name} to {model.name} successfully at  {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
 
                 await _repository.UpdateTopicAsync(id, model);
                 return Ok("Update Successfully");

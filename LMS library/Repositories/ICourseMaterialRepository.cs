@@ -1,6 +1,4 @@
-﻿
-
-namespace LMS_library.Repositories
+﻿namespace LMS_library.Repositories
 {
     public interface ICourseMaterialRepository
     {

@@ -46,9 +46,10 @@ namespace LMS_library.Repositories
                 image = null,
                 sex = sex,
                 phone = model.phone,
-                address= model.address,
+                address = model.address,
                 passwordHash = Convert.ToHexString(passswordHash),
                 passwordSalt = Convert.ToHexString(passwordSalt),
+                classId = null,
                 roleId = roleId.id,
 
             };
@@ -186,6 +187,7 @@ namespace LMS_library.Repositories
             user.address = user.address;
             user.passwordHash = user.passwordHash;
             user.passwordSalt = user.passwordSalt;
+            user.classId = user.classId;
             user.roleId = user.roleId;
             var updateUser = _mapper.Map<User>(user);
             _contex.Users?.Update(updateUser);
@@ -210,6 +212,7 @@ namespace LMS_library.Repositories
             user.address = user.address;
             user.passwordHash = user.passwordHash;
             user.passwordSalt = user.passwordSalt;
+            user.classId= user.classId;
             user.roleId = user.roleId;
             var updateUser = _mapper.Map<User>(user);
             _contex.Users?.Update(updateUser);

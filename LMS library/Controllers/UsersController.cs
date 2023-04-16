@@ -14,12 +14,13 @@ namespace LMS_library.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUserRepository _repository;
+        private readonly ISentHelpRepository _sentHelpRepository;
         private readonly IUserEditRepository _userEditRepository;
         private readonly IPasswordRepository _passwordRepository;
         private readonly INotificationRepository _notificationRepository;
         private readonly DataDBContex _contex;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        public UsersController(INotificationRepository notificationRepository, IHttpContextAccessor httpContextAccessor, IUserRepository repository, DataDBContex contex, IUserEditRepository userEditRepository, IPasswordRepository passwordRepository)
+        public UsersController(ISentHelpRepository sentHelpRepository,INotificationRepository notificationRepository, IHttpContextAccessor httpContextAccessor, IUserRepository repository, DataDBContex contex, IUserEditRepository userEditRepository, IPasswordRepository passwordRepository)
         {
             _repository = repository;
             _contex = contex;
@@ -27,6 +28,7 @@ namespace LMS_library.Controllers
             _httpContextAccessor = httpContextAccessor;
             _passwordRepository = passwordRepository;
             _notificationRepository = notificationRepository;
+            _sentHelpRepository= sentHelpRepository;
         }
 
 
@@ -112,7 +114,7 @@ namespace LMS_library.Controllers
         {
             var user = await _contex.Users.FindAsync(id);
             if (user == null) { return BadRequest(); }
-            await _notificationRepository.AddNotification($"Image has been deleted at {DateTime.Now.ToLocalTime}", Int32.Parse(UserInfo()), false);
+            await _notificationRepository.AddNotification($"Image has been deleted at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
             await _repository.DeleteImageAsync(id);
             return Ok("Delete Success !");
 
@@ -129,9 +131,30 @@ namespace LMS_library.Controllers
                 {
                     return NotFound();
                 }
-                await _notificationRepository.AddNotification($"Change detail {user.email} successfully at {DateTime.Now.ToLocalTime}", Int32.Parse(UserInfo()), false);
+                await _notificationRepository.AddNotification($"Change detail {user.email} successfully at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
                 await _userEditRepository.UpdateUserAsync(id, model);
                 return Ok("Update Successfully");
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+        [HttpPut("add-student-to-class/{id}")]
+        [Authorize(Roles = "Admin,Leader")]
+        public async Task<IActionResult> AddToClass(int id, string student) // id class and student email
+        {
+            try
+            {
+                var user = await _contex.Users.FirstOrDefaultAsync( u => u.email == student);
+                var classInfo = await _contex.Classes!.FindAsync(id);
+                if (classInfo == null || user == null)
+                {
+                    return NotFound();
+                }
+                await _notificationRepository.AddNotification($"You has been add to class {classInfo.className}{DateTime.Now.ToLocalTime()}",user.id, false);
+                await _userEditRepository.AddStudentToClass(id, student);
+                return Ok("Add  Successfully");
             }
             catch
             {
@@ -149,9 +172,24 @@ namespace LMS_library.Controllers
                 {
                     return NotFound();
                 }
-                await _notificationRepository.AddNotification($"Change password successfully at {DateTime.Now.ToLocalTime}", Int32.Parse(UserInfo()), false);
+                await _notificationRepository.AddNotification($"Change password successfully at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
                 await _passwordRepository.ChangePassword(id, model);
                 return Ok("Update Successfully");
+            }
+            catch
+            {
+                return BadRequest("Current Password Incorrect !");
+            }
+        }
+        [HttpPost("Sent-Help-To-Admin")]
+        [Authorize(Roles = "Admin,Teacher,Student,Leader")]
+        public async Task<IActionResult> SentHelp(SentHelpModel model)
+        {
+            try
+            {
+                await _notificationRepository.AddNotification($"Sent help to admin successfully at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
+                await _sentHelpRepository.SentHelp( model);
+                return Ok("Sent Successfully !");
             }
             catch
             {
@@ -166,7 +204,7 @@ namespace LMS_library.Controllers
             try
             {
 
-                await _notificationRepository.AddNotification($"Upload avata successfully at {DateTime.Now.ToLocalTime}", Int32.Parse(UserInfo()), false);
+                await _notificationRepository.AddNotification($"Upload avata successfully at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
                 await _repository.UploadImage(id, formFile);
                 return Ok("Update Successfully");
             }
@@ -182,7 +220,7 @@ namespace LMS_library.Controllers
             try
             {
 
-                await _notificationRepository.AddNotification($"Change avata successfully at {DateTime.Now.ToLocalTime}", Int32.Parse(UserInfo()), false);
+                await _notificationRepository.AddNotification($"Change avata successfully at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
                 await _repository.ChangeImage(id, formFile);
                 return Ok("Update Successfully");
             }

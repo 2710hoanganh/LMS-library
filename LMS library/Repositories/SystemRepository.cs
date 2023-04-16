@@ -136,7 +136,7 @@ namespace LMS_library.Repositories
             detail.image = null;
             var updateDetail = _mapper.Map<SystemDetail>(detail);
             _contex.System?.Update(updateDetail);
-            await _contex.SaveChangesAsync(); throw new NotImplementedException();
+            await _contex.SaveChangesAsync(); 
         }
     }
 }

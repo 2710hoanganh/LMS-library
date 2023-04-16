@@ -61,6 +61,7 @@ namespace LMS_library.Controllers
             catch { return BadRequest(); }
         }
         [HttpPost("add-resource-and-upload-file")]
+        [DisableRequestSizeLimit]
         public async Task<IActionResult> AddNewReourceAndUploadFile(string course , string topic ,string lesson ,IFormFile formFile)
         {
             try
@@ -79,7 +80,7 @@ namespace LMS_library.Controllers
             {
                 var resource = await _contex.ResourceLists!.FindAsync(id);
                 if (resource == null) { return BadRequest(); }
-                await _notificationRepository.AddNotification($"Resource of {resource.Lesson.name} deleted at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
+                await _notificationRepository.AddNotification($"Resource {resource.Material.name} deleted at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
                 await _repository.Delete(id);
                 return Ok("Delete Success !");
 

@@ -34,7 +34,7 @@ namespace LMS_library.Controllers
                 {
                     return BadRequest("Course already exists .");
                 }
-                await _notificationRepository.AddNotification($"{model.courseName} create successfully at {DateTime.Now.ToLocalTime}", Int32.Parse(UserInfo()), false);
+                await _notificationRepository.AddNotification($"Course {model.courseName} create successfully at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
                 var newCourse = await _repository.AddCourseAsync(model);
                 return Ok(newCourse);
             }
@@ -74,14 +74,17 @@ namespace LMS_library.Controllers
             try
             {
                 var course = await _repository.GetById(id);
-                return course == null ? NotFound() : Ok(new
+                var user = await _contex.Users!.FindAsync(course.userId);
+                var courseInfo = new
                 {
-                   course.courseCode,
-                   course.courseName,
-                   course.User.email,
-                   course.description,
-                   course.topics,
-                });
+                    course.courseCode,
+                    course.courseName,
+                    user.email,
+                    course.description,
+                    course.pendingMaterial
+
+                };
+                return course == null ? NotFound() : Ok(courseInfo);
             }
             catch { return BadRequest(); }
 
@@ -95,7 +98,7 @@ namespace LMS_library.Controllers
             {
                 var course = await _contex.Courses!.FindAsync(id);
                 if (course == null) { return BadRequest(); }
-                await _notificationRepository.AddNotification($"{course.courseName} deleted at {DateTime.Now.ToLocalTime}", Int32.Parse(UserInfo()), false);
+                await _notificationRepository.AddNotification($"Course {course.courseName} deleted at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
                 await _repository.DeleteCourseAsync(id);
                 return Ok("Delete Success !");
 
@@ -118,7 +121,7 @@ namespace LMS_library.Controllers
                 var role = await _contex.Roles.FirstOrDefaultAsync(r => r.id == teacher.roleId);
                 if (teacher == null) { return NotFound(); }
                 if(role == null || role.name != "Teacher" ) { return BadRequest(); }
-                await _notificationRepository.AddNotification($"{course.courseName} updated at {DateTime.Now.ToLocalTime}", Int32.Parse(UserInfo()), false);
+                await _notificationRepository.AddNotification($"Course {course.courseName} updated at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
                 await _repository.UpdateCourseAsync(id, model);
                 return Ok("Update Successfully");
             }

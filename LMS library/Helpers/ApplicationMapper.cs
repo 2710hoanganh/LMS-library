@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using LMS_library.Data;
+using LMS_library.Models;
 
 namespace LMS_library.Helpers
 {
@@ -23,6 +24,8 @@ namespace LMS_library.Helpers
             CreateMap<Exam, ExamModel>().ReverseMap();
             CreateMap<MultipleChoiceQuestions, QuestionsModel>().ReverseMap();
             CreateMap<Notification, NotificationModel>().ReverseMap();
+            CreateMap<SendHelp, SentHelpModel>().ReverseMap();
+            CreateMap<Class, ClassModel>().ReverseMap();
         }
     }
 }

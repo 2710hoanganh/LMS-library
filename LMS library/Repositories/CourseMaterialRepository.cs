@@ -24,7 +24,7 @@ namespace LMS_library.Repositories
         }
         public async Task PostMultiFileAsync(string type, string course, List<IFormFile> MaterialUploads)// type = material file type (Lesson or Resource) , course = course name
         {
-            var result = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email);
+            var result = _httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.Email);
             if (result == null)
             {
                 return;
@@ -43,6 +43,7 @@ namespace LMS_library.Repositories
                 courseID = courseName.id;
 
             }
+            if(materialType== null) { return; }
 
             var target = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\System\Course Material");
             if (!Directory.Exists(target))
@@ -109,18 +110,18 @@ namespace LMS_library.Repositories
         
         public async Task<List<CourseMaterial>> GetAllLesson()
         {
-            var result = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var result = _httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var files = await _contex.Materials!
-                .Where(f => f.UserId == Int32.Parse(result) && f.MaterialType.Equals("Lesson"))
+                .Where(f => f.UserId == Int32.Parse(result) && f.MaterialType.name.Equals("Lesson"))
                 .ToListAsync();
             return _mapper.Map<List<CourseMaterial>>(files);
         }
 
         public async Task<List<CourseMaterial>> GetAllResource() 
         {
-            var result = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var result = _httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var files = await _contex.Materials!
-                .Where(f => f.UserId == Int32.Parse(result) && f.MaterialType.Equals("Resource"))
+                .Where(f => f.UserId == Int32.Parse(result) && f.MaterialType.name.Equals("Resource"))
                 .ToListAsync();
             return _mapper.Map<List<CourseMaterial>>(files);
         }

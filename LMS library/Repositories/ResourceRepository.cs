@@ -9,10 +9,10 @@ namespace LMS_library.Repositories
 
         private readonly IMapper _mapper;
         private readonly DataDBContex _contex;
-        private readonly HttpContextAccessor _httpContextAccessor;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
 
-        public ResourceRepository(IMapper mapper, DataDBContex contex, HttpContextAccessor httpContextAccessor)
+        public ResourceRepository(IMapper mapper, DataDBContex contex, IHttpContextAccessor httpContextAccessor)
         {
             _mapper = mapper;
             _contex = contex;
@@ -25,8 +25,9 @@ namespace LMS_library.Repositories
             var topic = await _contex.Topics!.FirstOrDefaultAsync(t => t.courses.courseName == course.courseName&& t.name == model.topicName);
             var lesson = await _contex.Lessons.FirstOrDefaultAsync( l => l.topic.id == topic.id);
             var material = await _contex.Materials.FirstOrDefaultAsync(m => m.name == model.materialName && m.ResourceList ==null && m.MaterialType.name.Equals("Resource"));
+            var type = await _contex.MaterialTypes!.FirstOrDefaultAsync(t => t.id == material!.materialTypeID);
             if ( lesson == null || material == null ) { return ("Not found"); }
-            if(material.MaterialType.name != "Resource") { return ("Material type must be resource !"); }
+            if(type!.name != "Resource") { return ("Material type must be resource !"); }
             var resource = new ResourceList
             {
                 lessonId = lesson.id,
@@ -153,7 +154,7 @@ namespace LMS_library.Repositories
 
         private string UserInfo()
         {
-            var result = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var result = _httpContextAccessor!.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier);
             return result;
         }
     }

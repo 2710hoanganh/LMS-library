@@ -61,7 +61,7 @@ namespace LMS_library.Controllers
                 {
                     return BadRequest("Material type already exists .");
                 }
-                await _notificationRepository.AddNotification($"Material type {model.name} create successfully at {DateTime.Now.ToLocalTime}", Int32.Parse(UserInfo()), false);
+                await _notificationRepository.AddNotification($"Material type {model.name} create successfully at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
                 var new_type = await _repository.AddMaterialTypeAsync(model);
                 return Ok(new_type);
             }
@@ -81,7 +81,7 @@ namespace LMS_library.Controllers
                 {
                     return BadRequest();
                 }
-                await _notificationRepository.AddNotification($"Material type {type.name} delete successfully at {DateTime.Now.ToLocalTime}", Int32.Parse(UserInfo()), false);
+                await _notificationRepository.AddNotification($"Material type {type.name} delete successfully at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
                 await _repository.DeleteMaterialTypeAsync(id);
                 return Ok("Delete Success !");
 
@@ -101,7 +101,7 @@ namespace LMS_library.Controllers
                 {
                     return NotFound();
                 }
-                await _notificationRepository.AddNotification($"Change material type {type.name} to {model.name} successfully", Int32.Parse(UserInfo()), false);
+                await _notificationRepository.AddNotification($"Change material type {type.name} to {model.name} successfully at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
                 await _repository.UpdateMaterialTypeAsync(id, model);
                 return Ok("Update Successfully");
             }

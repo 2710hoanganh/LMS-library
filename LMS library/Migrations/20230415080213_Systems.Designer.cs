@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LMS_library.Migrations
 {
     [DbContext(typeof(DataDBContex))]
-    [Migration("20230410094324_Systems")]
+    [Migration("20230415080213_Systems")]
     partial class Systems
     {
         /// <inheritdoc />
@@ -24,6 +24,36 @@ namespace LMS_library.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("LMS_library.Data.Class", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
+
+                    b.Property<string>("classCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("className")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("courseId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("teacherEmail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("courseId");
+
+                    b.ToTable("Classes");
+                });
 
             modelBuilder.Entity("LMS_library.Data.Course", b =>
                 {
@@ -54,8 +84,7 @@ namespace LMS_library.Migrations
                     b.Property<DateTime>("submission")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("userId")
-                        .IsRequired()
+                    b.Property<int>("userId")
                         .HasColumnType("int");
 
                     b.HasKey("id");
@@ -98,9 +127,6 @@ namespace LMS_library.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("resourceId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("submission_date")
                         .HasColumnType("datetime2");
 
@@ -111,8 +137,6 @@ namespace LMS_library.Migrations
                     b.HasIndex("courseId");
 
                     b.HasIndex("materialTypeID");
-
-                    b.HasIndex("resourceId");
 
                     b.ToTable("Materials");
                 });
@@ -170,10 +194,6 @@ namespace LMS_library.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
-
-                    b.Property<string>("description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("materialId")
                         .HasColumnType("int");
@@ -343,9 +363,15 @@ namespace LMS_library.Migrations
                     b.Property<int>("lessonId")
                         .HasColumnType("int");
 
+                    b.Property<int>("materialId")
+                        .HasColumnType("int");
+
                     b.HasKey("id");
 
                     b.HasIndex("lessonId");
+
+                    b.HasIndex("materialId")
+                        .IsUnique();
 
                     b.ToTable("ResourceLists");
                 });
@@ -376,6 +402,27 @@ namespace LMS_library.Migrations
                     b.HasKey("id");
 
                     b.ToTable("Roles");
+                });
+
+            modelBuilder.Entity("LMS_library.Data.SendHelp", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
+
+                    b.Property<string>("content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("userEmail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("id");
+
+                    b.ToTable("SendHelps");
                 });
 
             modelBuilder.Entity("LMS_library.Data.SystemDetail", b =>
@@ -463,6 +510,9 @@ namespace LMS_library.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("classId")
+                        .HasColumnType("int");
+
                     b.Property<string>("email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -495,8 +545,7 @@ namespace LMS_library.Migrations
                     b.Property<DateTime?>("resetTokenExpires")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("roleId")
-                        .IsRequired()
+                    b.Property<int>("roleId")
                         .HasColumnType("int");
 
                     b.Property<int>("sex")
@@ -508,9 +557,22 @@ namespace LMS_library.Migrations
 
                     b.HasKey("id");
 
+                    b.HasIndex("classId");
+
                     b.HasIndex("roleId");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("LMS_library.Data.Class", b =>
+                {
+                    b.HasOne("LMS_library.Data.Course", "Course")
+                        .WithMany("classes")
+                        .HasForeignKey("courseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Course");
                 });
 
             modelBuilder.Entity("LMS_library.Data.Course", b =>
@@ -544,13 +606,7 @@ namespace LMS_library.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LMS_library.Data.ResourceList", "ResourceList")
-                        .WithMany("CourseMaterial")
-                        .HasForeignKey("resourceId");
-
                     b.Navigation("MaterialType");
-
-                    b.Navigation("ResourceList");
 
                     b.Navigation("User");
 
@@ -595,7 +651,15 @@ namespace LMS_library.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("LMS_library.Data.CourseMaterial", "Material")
+                        .WithOne("ResourceList")
+                        .HasForeignKey("LMS_library.Data.ResourceList", "materialId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Lesson");
+
+                    b.Navigation("Material");
                 });
 
             modelBuilder.Entity("LMS_library.Data.Topic", b =>
@@ -611,17 +675,30 @@ namespace LMS_library.Migrations
 
             modelBuilder.Entity("LMS_library.Data.User", b =>
                 {
+                    b.HasOne("LMS_library.Data.Class", "Class")
+                        .WithMany("Users")
+                        .HasForeignKey("classId");
+
                     b.HasOne("LMS_library.Data.Role", "Role")
                         .WithMany("users")
                         .HasForeignKey("roleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Class");
+
                     b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("LMS_library.Data.Class", b =>
+                {
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("LMS_library.Data.Course", b =>
                 {
+                    b.Navigation("classes");
+
                     b.Navigation("materials");
 
                     b.Navigation("topics");
@@ -631,6 +708,9 @@ namespace LMS_library.Migrations
                 {
                     b.Navigation("Lesson")
                         .IsRequired();
+
+                    b.Navigation("ResourceList")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("LMS_library.Data.Lesson", b =>
@@ -639,11 +719,6 @@ namespace LMS_library.Migrations
                 });
 
             modelBuilder.Entity("LMS_library.Data.MaterialType", b =>
-                {
-                    b.Navigation("CourseMaterial");
-                });
-
-            modelBuilder.Entity("LMS_library.Data.ResourceList", b =>
                 {
                     b.Navigation("CourseMaterial");
                 });

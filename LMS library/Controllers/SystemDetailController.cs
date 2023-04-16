@@ -97,7 +97,7 @@ namespace LMS_library.Controllers
             try
             {
 
-                await _notificationRepository.AddNotification($"Upload logo for system successfully at {DateTime.Now.ToLocalTime}", Int32.Parse(UserInfo()), false);
+                await _notificationRepository.AddNotification($"Upload logo for system successfully at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
                 await _repository.UploadImage(id, formFile);
                 return Ok("Update Successfully");
             }

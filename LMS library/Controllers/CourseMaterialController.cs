@@ -30,6 +30,7 @@ namespace LMS_library.Controllers
 
 
         [Authorize(Roles = "Leader,Teacher")]
+        [DisableRequestSizeLimit]
         [HttpPost("upload-file")]
         public async Task<IActionResult> PostMultiFile( string type , string course , List<IFormFile> FileUpload)//upload lesson or resourse , type = file type (lesson or resourse) , course = course name
         {
@@ -66,19 +67,21 @@ namespace LMS_library.Controllers
         }
         [Authorize(Roles = "Leader")]
         [HttpGet("list-course-material")]
-        public async Task<IActionResult> GetAllFile()//course id  , 
+        public async Task<IActionResult> GetAllFile()
         {
             try
             {
-                return Ok(await _repository.GetAll();
+                return Ok(await _repository.GetAll());
             }
             catch
             {
                 return BadRequest();
             }
         }
+
+
         [Authorize(Roles = "Leader,Teacher")]
-        [HttpGet("list-course-material")]
+        [HttpGet("list-course-base-on-course")]
         public async Task<IActionResult> GetAllCourseFile(int id)//course id  , 
         {
             try
@@ -105,7 +108,7 @@ namespace LMS_library.Controllers
         }
         [Authorize(Roles = "Leader,Teacher")]
         [HttpGet("list-course-material-teacher")]
-        public async Task<IActionResult> GetallForTeahcher()//course id  , 
+        public async Task<IActionResult> GetAllForTeahcher()//course id  , 
         {
             try
             {
@@ -147,13 +150,13 @@ namespace LMS_library.Controllers
                 }
                 if(check == "Approved")
                 {
-                    await _notificationRepository.AddNotification($"File {file.name} from {file.courses.courseName} approved at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
-                    await _notificationRepository.AddNotification($"Your file {file.name} has been approved at {DateTime.Now.ToLocalTime()}", file.User.id, false);
+                    await _notificationRepository.AddNotification($"File {file.name} approved at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
+                    await _notificationRepository.AddNotification($"Your file {file.name} has been approved at {DateTime.Now.ToLocalTime()}",file.UserId, false);
                 }
                 if(check == "Reject")
                 {
-                    await _notificationRepository.AddNotification($"File {file.name} from {file.courses.courseName} reject at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
-                    await _notificationRepository.AddNotification($"Your file {file.name} has been reject by leader at {DateTime.Now.ToLocalTime()}", file.User.id, false);
+                    await _notificationRepository.AddNotification($"File {file.name}  reject at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
+                    await _notificationRepository.AddNotification($"Your file {file.name} has been reject by leader at {DateTime.Now.ToLocalTime()}", file.UserId, false);
                 }
                 await _repository.FileApprove(check, id);
 
@@ -199,7 +202,7 @@ namespace LMS_library.Controllers
                 {
                     return BadRequest("Please Enter File Name");
                 }
-                await _notificationRepository.AddNotification($"File {file.name} has been change to {newName} at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
+                await _notificationRepository.AddNotification($"File name {file.name} has been change to {newName} at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
                 await _repository.UpdateFileAsync(newName, id);
 
                 return Ok("Update Successfully");
@@ -225,7 +228,7 @@ namespace LMS_library.Controllers
                 {
                     return BadRequest("Please Enter File Name");
                 }
-                await _notificationRepository.AddNotification($"File {file.name} has been add to {topic} at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
+                await _notificationRepository.AddNotification($"File name {file.name} has been add to {topic} at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
                 await _repository.AddToResource(topic, id);
 
                 return Ok("Update Successfully");

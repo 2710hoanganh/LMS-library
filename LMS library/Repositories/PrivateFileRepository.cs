@@ -61,7 +61,7 @@ namespace LMS_library.Repositories
         }
         public async Task<List<PrivateFiles>> GetAll()
         {
-            var result = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var result = _httpContextAccessor!.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var files = await _contex.PrivateFiles!.Where(f => f.userId == Int32.Parse(result)).ToListAsync();
             return _mapper.Map<List<PrivateFiles>>(files);
         }

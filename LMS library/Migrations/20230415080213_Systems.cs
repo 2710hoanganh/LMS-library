@@ -101,6 +101,20 @@ namespace LMS_library.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "SendHelps",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    userEmail = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    content = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SendHelps", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "System",
                 columns: table => new
                 {
@@ -122,6 +136,22 @@ namespace LMS_library.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Classes",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    classCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    className = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    teacherEmail = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    courseId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Classes", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
@@ -137,6 +167,7 @@ namespace LMS_library.Migrations
                     address = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     passwordHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     passwordSalt = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    classId = table.Column<int>(type: "int", nullable: true),
                     roleId = table.Column<int>(type: "int", nullable: false),
                     resetToken = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     resetTokenExpires = table.Column<DateTime>(type: "datetime2", nullable: true)
@@ -144,6 +175,11 @@ namespace LMS_library.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_Users_Classes_classId",
+                        column: x => x.classId,
+                        principalTable: "Classes",
+                        principalColumn: "id");
                     table.ForeignKey(
                         name: "FK_Users_Roles_roleId",
                         column: x => x.roleId,
@@ -203,6 +239,44 @@ namespace LMS_library.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Materials",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    materialTypeID = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    courseId = table.Column<int>(type: "int", nullable: false),
+                    fileStatus = table.Column<int>(type: "int", nullable: false),
+                    materialPath = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    fileSize = table.Column<int>(type: "int", nullable: false),
+                    submission_date = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Materials", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_Materials_Courses_courseId",
+                        column: x => x.courseId,
+                        principalTable: "Courses",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Materials_MaterialTypes_materialTypeID",
+                        column: x => x.materialTypeID,
+                        principalTable: "MaterialTypes",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Materials_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.NoAction);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Topics",
                 columns: table => new
                 {
@@ -230,7 +304,6 @@ namespace LMS_library.Migrations
                     id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     topicId = table.Column<int>(type: "int", nullable: false),
                     materialId = table.Column<int>(type: "int", nullable: false)
                 },
@@ -238,11 +311,17 @@ namespace LMS_library.Migrations
                 {
                     table.PrimaryKey("PK_Lessons", x => x.id);
                     table.ForeignKey(
+                        name: "FK_Lessons_Materials_materialId",
+                        column: x => x.materialId,
+                        principalTable: "Materials",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
                         name: "FK_Lessons_Topics_topicId",
                         column: x => x.topicId,
                         principalTable: "Topics",
                         principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -251,7 +330,8 @@ namespace LMS_library.Migrations
                 {
                     id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    lessonId = table.Column<int>(type: "int", nullable: false)
+                    lessonId = table.Column<int>(type: "int", nullable: false),
+                    materialId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -262,51 +342,18 @@ namespace LMS_library.Migrations
                         principalTable: "Lessons",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Materials",
-                columns: table => new
-                {
-                    id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    materialTypeID = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    courseId = table.Column<int>(type: "int", nullable: false),
-                    resourceId = table.Column<int>(type: "int", nullable: true),
-                    fileStatus = table.Column<int>(type: "int", nullable: false),
-                    materialPath = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    fileSize = table.Column<int>(type: "int", nullable: false),
-                    submission_date = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Materials", x => x.id);
                     table.ForeignKey(
-                        name: "FK_Materials_Courses_courseId",
-                        column: x => x.courseId,
-                        principalTable: "Courses",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Materials_MaterialTypes_materialTypeID",
-                        column: x => x.materialTypeID,
-                        principalTable: "MaterialTypes",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Materials_ResourceLists_resourceId",
-                        column: x => x.resourceId,
-                        principalTable: "ResourceLists",
-                        principalColumn: "id");
-                    table.ForeignKey(
-                        name: "FK_Materials_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
+                        name: "FK_ResourceLists_Materials_materialId",
+                        column: x => x.materialId,
+                        principalTable: "Materials",
                         principalColumn: "id",
                         onDelete: ReferentialAction.NoAction);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Classes_courseId",
+                table: "Classes",
+                column: "courseId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Courses_userId",
@@ -335,11 +382,6 @@ namespace LMS_library.Migrations
                 column: "materialTypeID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Materials_resourceId",
-                table: "Materials",
-                column: "resourceId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Materials_UserId",
                 table: "Materials",
                 column: "UserId");
@@ -355,9 +397,20 @@ namespace LMS_library.Migrations
                 column: "lessonId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ResourceLists_materialId",
+                table: "ResourceLists",
+                column: "materialId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Topics_courseId",
                 table: "Topics",
                 column: "courseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_classId",
+                table: "Users",
+                column: "classId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_roleId",
@@ -365,28 +418,20 @@ namespace LMS_library.Migrations
                 column: "roleId");
 
             migrationBuilder.AddForeignKey(
-                name: "FK_Lessons_Materials_materialId",
-                table: "Lessons",
-                column: "materialId",
-                principalTable: "Materials",
+                name: "FK_Classes_Courses_courseId",
+                table: "Classes",
+                column: "courseId",
+                principalTable: "Courses",
                 principalColumn: "id",
-                onDelete: ReferentialAction.NoAction);
+                onDelete: ReferentialAction.Cascade);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
-                name: "FK_Courses_Users_userId",
-                table: "Courses");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Materials_Users_UserId",
-                table: "Materials");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Lessons_Materials_materialId",
-                table: "Lessons");
+                name: "FK_Classes_Courses_courseId",
+                table: "Classes");
 
             migrationBuilder.DropTable(
                 name: "Exams");
@@ -401,31 +446,37 @@ namespace LMS_library.Migrations
                 name: "Questions");
 
             migrationBuilder.DropTable(
-                name: "System");
-
-            migrationBuilder.DropTable(
-                name: "Users");
-
-            migrationBuilder.DropTable(
-                name: "Roles");
-
-            migrationBuilder.DropTable(
-                name: "Materials");
-
-            migrationBuilder.DropTable(
-                name: "MaterialTypes");
-
-            migrationBuilder.DropTable(
                 name: "ResourceLists");
+
+            migrationBuilder.DropTable(
+                name: "SendHelps");
+
+            migrationBuilder.DropTable(
+                name: "System");
 
             migrationBuilder.DropTable(
                 name: "Lessons");
 
             migrationBuilder.DropTable(
+                name: "Materials");
+
+            migrationBuilder.DropTable(
                 name: "Topics");
 
             migrationBuilder.DropTable(
+                name: "MaterialTypes");
+
+            migrationBuilder.DropTable(
                 name: "Courses");
+
+            migrationBuilder.DropTable(
+                name: "Users");
+
+            migrationBuilder.DropTable(
+                name: "Classes");
+
+            migrationBuilder.DropTable(
+                name: "Roles");
         }
     }
 }

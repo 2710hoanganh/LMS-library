@@ -21,7 +21,7 @@ namespace LMS_library.Data
         [ForeignKey("materialTypeID")]
         public MaterialType MaterialType { get; set; }
         [Required]
-        public int? UserId { get; set; }
+        public int UserId { get; set; }
         [ForeignKey("UserId")]
         public User User { get; set; }
         public int? courseId { get; set; }

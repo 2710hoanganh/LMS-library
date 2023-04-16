@@ -82,7 +82,7 @@ namespace LMS_library.Controllers
             try
             {
                 var file = await _contex.PrivateFiles.FirstOrDefaultAsync(u => u.id == id);
-                if (file == null)
+                if (file == null || file.userId != Int32.Parse(UserInfo()))
                 {
                     return NotFound();
                 }

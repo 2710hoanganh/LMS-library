@@ -1,4 +1,5 @@
-﻿using DocumentFormat.OpenXml.Office2010.Excel;
+﻿
+using DocumentFormat.OpenXml.Office2010.Excel;
 using DocumentFormat.OpenXml.Spreadsheet;
 using LMS_library.Data;
 using LMS_library.Repositories;
@@ -63,7 +64,7 @@ namespace LMS_library.Controllers
                 {
                     return BadRequest("Role already exists .");
                 }
-                await _notificationRepository.AddNotification($"Role {model.name} create successfully at {DateTime.Now.ToLocalTime}" ,Int32.Parse(UserInfo()), false);
+                await _notificationRepository.AddNotification($"Role {model.name} create successfully at {DateTime.Now.ToLocalTime()}" ,Int32.Parse(UserInfo()), false);
                 var newRole = await _repository.AddRoleAsync(model);
                 return Ok(newRole);
             }
@@ -103,7 +104,7 @@ namespace LMS_library.Controllers
                 {
                     return NotFound();
                 }
-                await _notificationRepository.AddNotification($"Change {role.name} to {model.name} successfully", Int32.Parse(UserInfo()), false);
+                await _notificationRepository.AddNotification($"Change role name {role.name} to {model.name} successfully at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
                 await _repository.UpdateRoleAsync(id, model);
                 return Ok("Update Successfully");
             }
