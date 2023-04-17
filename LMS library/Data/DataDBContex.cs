@@ -36,5 +36,7 @@ namespace LMS_library.Data
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<SendHelp> SendHelps { get; set; }
         public DbSet<Class> Classes { get; set; }
+        public DbSet<Question> LessonQuestions { get; set; }
+        public DbSet<Answer> Answers { get; set; }
     }
 }

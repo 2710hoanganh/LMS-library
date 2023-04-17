@@ -26,6 +26,8 @@ namespace LMS_library.Helpers
             CreateMap<Notification, NotificationModel>().ReverseMap();
             CreateMap<SendHelp, SentHelpModel>().ReverseMap();
             CreateMap<Class, ClassModel>().ReverseMap();
+            CreateMap<Question,LessonQuestionModel>().ReverseMap();
+
         }
     }
 }

@@ -130,6 +130,25 @@ namespace LMS_library.Controllers
                 return BadRequest();
             }
         }
+        [Authorize(Roles ="Student")]
+        [HttpPut("student-liked-course/{id}")]
+        public async Task<IActionResult> StudentLikedCourse(int id)
+        {
+            try
+            {
+                var course = await _contex.Classes!.FirstOrDefaultAsync(c => c.courseId == id);
+                if (course == null)
+                {
+                    return NotFound();
+                }
+                await _repository.StudentSetLikedCourse(id);
+                return Ok("Update Successfully");
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
 
         [HttpGet("search-sort")]
         public async Task<IActionResult> SearchSort(string? search , string? course ,string?teacher , string?status)

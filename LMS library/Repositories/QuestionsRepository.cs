@@ -8,6 +8,7 @@ using System.IO;
 using ClosedXML;
 using System.Security.Claims;
 using ClosedXML.Excel;
+using Microsoft.Office.Interop.Excel;
 using System.IO.Packaging;
 using System.Linq;
 using static LMS_library.Data.MultipleChoiceQuestions;
@@ -34,7 +35,7 @@ namespace LMS_library.Repositories
         public async Task<string> AddQuestionAsync(QuestionsModel model)
         {
 
-            var result = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email);
+            var result = _httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.Email);
             if (result == null)
             {
                 return ("User Is Required");
@@ -148,7 +149,7 @@ namespace LMS_library.Repositories
 
         public  async Task AddExamByExistQuestion(string courseName, string examName,string time, int examNumber, int pointRange, int questionQuantity, int easyQuestionQuantity, int nomalQuestionQuantity, int hardQuestionQuantity)
         {
-            var result = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email);
+            var result = _httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.Email);
             var questions = _contex.Questions.AsQueryable();
             if (easyQuestionQuantity!= null && nomalQuestionQuantity!=null && hardQuestionQuantity != null )
             {
@@ -260,6 +261,8 @@ namespace LMS_library.Repositories
             });
             return result.ToList();
         }
+
+    
     }
 }
     

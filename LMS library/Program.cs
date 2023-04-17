@@ -18,7 +18,7 @@ builder.Services.AddControllersWithViews()
 );
 builder.Services.Configure<IISServerOptions>(options =>
 {
-    options.MaxRequestBodySize = null;
+    options.MaxRequestBodySize = long.MaxValue;
 });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -74,6 +74,8 @@ builder.Services.AddScoped<IQuestionsRepository, QuestionsRepository>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<ISentHelpRepository, SentHelpRepository>();
 builder.Services.AddScoped<IClassRepository, ClassRepository>();
+builder.Services.AddScoped<ILessonQuestionRepository, LessonQuestionRepository>();
+builder.Services.AddScoped<IAnswerRepository, AnswerRepository>();
 //Jwt Token Functionality
 //Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>

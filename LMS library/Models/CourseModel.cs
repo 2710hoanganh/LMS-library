@@ -16,6 +16,8 @@ namespace LMS_library.Models
         public string teacherEmail { get; set; } = string.Empty;
         public string description { get; set; } = string.Empty;
         public DateTime submission { get; set; } = DateTime.Now;
+        [DefaultValue(false)]
+        public bool isLiked { get; set; }
         [DefaultValue(0)]
         public int pendingMaterial { get; set; }
         public DateTime createDate { get; set; } = DateTime.Now;

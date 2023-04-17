@@ -13,7 +13,7 @@ namespace LMS_library.Data
         [Required]
         public string courseName { get; set; } = string.Empty;
         [Required]
-        public int userId { get; set; }
+        public int  userId { get; set; }
         [ForeignKey("userId")]
         public User User { get; set; }
         public string description { get; set; } = string.Empty;

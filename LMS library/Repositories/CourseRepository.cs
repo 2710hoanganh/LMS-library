@@ -32,6 +32,7 @@ namespace LMS_library.Repositories
                 userId = teacher.id,
                 description = model.description,
                 submission = DateTime.Now,
+   
                 pendingMaterial = model.pendingMaterial,
                 createDate = DateTime.Now,
             };
@@ -61,10 +62,9 @@ namespace LMS_library.Repositories
 
         public async Task<List<CourseModel>> GetAllForTeacher()
         {
-            var result = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email);
+            var result = _httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.Email);
             var user = await _contex.Users!.FirstOrDefaultAsync(u => u.email == result.ToString());
-            int id = user.id;
-            var courses = await _contex.Courses!.Where(c => c.userId == id).ToListAsync();
+            var courses = await _contex.Courses!.Where(c => c.userId == user.id).ToListAsync();
             
             return _mapper.Map<List<CourseModel>>(courses);
         }
@@ -80,6 +80,7 @@ namespace LMS_library.Repositories
             {
                 var teacher = await _contex.Users.FirstOrDefaultAsync(u => u.email == model.teacherEmail);
                 var course = await _contex.Courses!.FindAsync(model.id);
+                if(course== null) { return; }
                 course.courseCode = model.courseCode;
                 course.courseName = model.courseName;
                 course.userId = teacher.id;
@@ -87,11 +88,36 @@ namespace LMS_library.Repositories
                 course.submission = course.submission;
                 course.pendingMaterial = course.pendingMaterial;
                 course.createDate = course.createDate;
+   
                 var updateCourse = _mapper.Map<Course>(course);
                 _contex.Courses?.Update(updateCourse);
                 await _contex.SaveChangesAsync();
             }
         }
+        
+
+        public async Task StudentSetLikedCourse(int id)
+        {
+            var result = _httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var course = await _contex.Courses!.FindAsync(id);
+            if(course == null)
+            {
+                return;
+            }
+            var classInfo = await _contex.Classes.FirstOrDefaultAsync(c => c.courseId == course.id);
+            if(classInfo== null || classInfo.id != Int32.Parse(result)) { return; }
+            course.courseCode = course.courseCode;
+            course.courseName = course.courseName;
+            course.userId = course.userId;
+            course.description = course.description;
+            course.submission = course.submission;
+            course.pendingMaterial = course.pendingMaterial;
+            course.createDate = course.createDate;
+            var updateCourse = _mapper.Map<Course>(course);
+            _contex.Courses?.Update(updateCourse);
+            await _contex.SaveChangesAsync();
+
+        }   
         public async Task<List<CourseModel>> SearchSort(string? search, string? course, string? teacher, string? courseCode)
         {
             var courses = _contex.Courses.AsQueryable();
@@ -144,5 +170,6 @@ namespace LMS_library.Repositories
             });
             return result.ToList();
         }
+
     }
 }

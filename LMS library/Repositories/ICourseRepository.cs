@@ -10,6 +10,7 @@
         public Task<Course> GetById(int id);
         public Task<string> AddCourseAsync(CourseModel model);
         public Task UpdateCourseAsync(int id, CourseModel model);
+        public Task StudentSetLikedCourse (int id ); // course ID
         public Task DeleteCourseAsync(int id);
     }
 }

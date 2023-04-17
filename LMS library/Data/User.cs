@@ -39,7 +39,6 @@ namespace LMS_library.Data
 
         public string? resetToken { get; set; }  
         public DateTime? resetTokenExpires { get; set; }
-
         public virtual ICollection<PrivateFiles> files { get; set; }
         public ICollection<Course> Course { get; set; }
         public virtual ICollection<CourseMaterial> materials { get; set; }

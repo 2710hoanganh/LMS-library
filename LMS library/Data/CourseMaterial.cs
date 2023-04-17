@@ -37,6 +37,5 @@ namespace LMS_library.Data
         public  Lesson Lesson { get; set; }
 
 
-
     }
 }

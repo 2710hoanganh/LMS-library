@@ -88,7 +88,6 @@ namespace LMS_library.Controllers
         public ActionResult Logout()
         {
 
-
             return Ok();
         }
 

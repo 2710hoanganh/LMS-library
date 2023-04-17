@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace LMS_library.Migrations
 {
     /// <inheritdoc />
-    public partial class Systems : Migration
+    public partial class System : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -133,6 +133,21 @@ namespace LMS_library.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_System", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Answers",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    userId = table.Column<int>(type: "int", nullable: false),
+                    questionId = table.Column<int>(type: "int", nullable: false),
+                    answer = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Answers", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
@@ -325,6 +340,28 @@ namespace LMS_library.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "LessonQuestions",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    userId = table.Column<int>(type: "int", nullable: false),
+                    lessonId = table.Column<int>(type: "int", nullable: false),
+                    title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    content = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LessonQuestions", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_LessonQuestions_Lessons_lessonId",
+                        column: x => x.lessonId,
+                        principalTable: "Lessons",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ResourceLists",
                 columns: table => new
                 {
@@ -351,6 +388,11 @@ namespace LMS_library.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Answers_questionId",
+                table: "Answers",
+                column: "questionId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Classes_courseId",
                 table: "Classes",
                 column: "courseId");
@@ -359,6 +401,11 @@ namespace LMS_library.Migrations
                 name: "IX_Courses_userId",
                 table: "Courses",
                 column: "userId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LessonQuestions_lessonId",
+                table: "LessonQuestions",
+                column: "lessonId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Lessons_materialId",
@@ -418,6 +465,14 @@ namespace LMS_library.Migrations
                 column: "roleId");
 
             migrationBuilder.AddForeignKey(
+                name: "FK_Answers_LessonQuestions_questionId",
+                table: "Answers",
+                column: "questionId",
+                principalTable: "LessonQuestions",
+                principalColumn: "id",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
                 name: "FK_Classes_Courses_courseId",
                 table: "Classes",
                 column: "courseId",
@@ -432,6 +487,9 @@ namespace LMS_library.Migrations
             migrationBuilder.DropForeignKey(
                 name: "FK_Classes_Courses_courseId",
                 table: "Classes");
+
+            migrationBuilder.DropTable(
+                name: "Answers");
 
             migrationBuilder.DropTable(
                 name: "Exams");
@@ -453,6 +511,9 @@ namespace LMS_library.Migrations
 
             migrationBuilder.DropTable(
                 name: "System");
+
+            migrationBuilder.DropTable(
+                name: "LessonQuestions");
 
             migrationBuilder.DropTable(
                 name: "Lessons");

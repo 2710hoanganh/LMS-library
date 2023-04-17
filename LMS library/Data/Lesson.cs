@@ -19,6 +19,7 @@ namespace LMS_library.Data
         public Topic topic { get; set; }
         public int materialId { get; set; }
         public  CourseMaterial Material { get; set; }
-        public ICollection<ResourceList> resourceLists { get; set; }    
+        public virtual ICollection<ResourceList> resourceLists { get; set; }    
+        public virtual ICollection<Question> Questions { get; set; }
     }
 }

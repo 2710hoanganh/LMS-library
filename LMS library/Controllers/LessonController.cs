@@ -1,5 +1,6 @@
 ﻿using LMS_library.Data;
 using LMS_library.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -8,18 +9,23 @@ namespace LMS_library.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Teacher")]
     public class LessonController : ControllerBase
     {
         private readonly ILessonRepository _repository;
+        private readonly ILessonQuestionRepository _lessonQuestionRepository;
+        private readonly IAnswerRepository _answerRepository;
         private readonly DataDBContex _contex;
         private readonly INotificationRepository _notificationRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        public LessonController(INotificationRepository notificationRepository, IHttpContextAccessor httpContextAccessor, ILessonRepository repository, DataDBContex contex)
+        public LessonController(ILessonQuestionRepository lessonQuestionRepository,IAnswerRepository answerRepository,INotificationRepository notificationRepository, IHttpContextAccessor httpContextAccessor, ILessonRepository repository, DataDBContex contex)
         {
             _repository = repository;
             _contex = contex;
             _notificationRepository = notificationRepository;
             _httpContextAccessor = httpContextAccessor;
+            _lessonQuestionRepository= lessonQuestionRepository;
+            _answerRepository= answerRepository;
         }
 
         [HttpGet("list")]
@@ -60,6 +66,34 @@ namespace LMS_library.Controllers
             }
             catch { return BadRequest(); }
 
+        }
+
+
+        [Authorize(Roles = "Teacher,Student")]
+        [HttpPost("add-lesson-question")]
+        public async Task<IActionResult> AddQuestions(LessonQuestionModel model)
+        {
+            try
+            {
+                await _notificationRepository.AddNotification($"Question {model.title} sent successfully at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);                var newQuestion = await _lessonQuestionRepository.AddQuestion(model);
+                return Ok(newQuestion);
+            }
+            catch { return BadRequest(); }
+        }
+        [Authorize(Roles = "Teacher,Student")]
+        [HttpPost("answer-lesson-question")]
+        public async Task<IActionResult> AnswerQuestion(AnswerModel model)
+        {
+            try
+            {
+                var question = await _contex.LessonQuestions!.FindAsync(model.questionId);
+                if (question == null) { return NotFound(); }
+                await _notificationRepository.AddNotification($"Your answer for {question.title} sent successfully at {DateTime.Now.ToLocalTime()}", Int32.Parse(UserInfo()), false);
+                await _notificationRepository.AddNotification($"Your question has answered by {Int32.Parse(UserInfo())} at {DateTime.Now.ToLocalTime()}" , question.userId,false);
+                var newAnswer = await _answerRepository.AnswerQuestion(model);
+                return Ok(newAnswer);
+            }
+            catch { return BadRequest(); }
         }
 
 
