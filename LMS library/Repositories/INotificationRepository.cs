@@ -5,7 +5,6 @@ namespace LMS_library.Repositories
     public interface INotificationRepository
     {
         public Task AddNotification(string message, int userId, bool IsRead);
-        public Task<string> CreateNotificationToStudent
         public Task<List<Notification>> GetAllById();// get all user notification
         public Task<NotificationModel> GetById(int id);
         public Task UpdateNotificationAsync(int id, NotificationModel model);
