@@ -91,7 +91,7 @@ namespace LMS_library.Controllers
             {
                 return BadRequest("User already exists .");
             }
-            await _notificationRepository.AddNotification($"{model.email} create successfully with role {model.role} at {DateTime.Now.ToLocalTime}",Int32.Parse(UserInfo()),false);
+            //await _notificationRepository.AddNotification($"{model.email} create successfully with role {model.role} at {DateTime.Now.ToLocalTime}",Int32.Parse(UserInfo()),false);
             var newUser = await _repository.AddUserAsync(model);
             return Ok(newUser);
         }

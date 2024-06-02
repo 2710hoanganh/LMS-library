@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using LMS_library.Data_Service;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LMS_library.Repositories
@@ -8,11 +9,13 @@ namespace LMS_library.Repositories
 
         private readonly IMapper _mapper;
         private readonly DataDBContex _contex;
+        private readonly ICaching _caching;
 
-        public RoleRepository(IMapper mapper, DataDBContex contex)
+        public RoleRepository(IMapper mapper, DataDBContex contex ,ICaching caching)
         {
             _mapper = mapper;
             _contex = contex;
+            _caching = caching;
         }
 
         public async Task<string> AddRoleAsync(RoleModel model)
@@ -36,8 +39,18 @@ namespace LMS_library.Repositories
 
         public async Task<List<Role>> GetAll()
         {
-            var role = await _contex.Roles!.ToListAsync();
-            return _mapper.Map<List<Role>>(role);
+            var cacheData = _caching.GetData<IEnumerable<Role>>("roles");
+            if(cacheData !=null && cacheData.Count() > 0)
+            {
+                return cacheData.ToList();
+            }
+            else
+            {
+                cacheData = await _contex.Roles.ToListAsync();
+                var expiryTime = DateTimeOffset.Now.AddSeconds(30);
+                _caching.SetData<IEnumerable<Role>>("roles" , cacheData , expiryTime);
+                return cacheData.ToList();
+            }
         }
 
         public async Task<RoleModel> GetById(int id)//role id

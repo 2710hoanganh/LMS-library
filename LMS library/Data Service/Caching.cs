@@ -1,4 +1,5 @@
 ﻿
+using Newtonsoft.Json;
 using StackExchange.Redis;
 using System.Text.Json;
 
@@ -18,7 +19,7 @@ namespace LMS_library.Data_Service
 
             if (!string.IsNullOrEmpty(value))
             {
-                return JsonSerializer.Deserialize<T>(value);    
+                return JsonConvert.DeserializeObject<T>(value);    
             }
             return default;
         }
@@ -36,7 +37,7 @@ namespace LMS_library.Data_Service
         public bool SetData<T>(string key, T value, DateTimeOffset expirationTime)
         {
             var expirayTime = expirationTime.DateTime.Subtract(DateTime.Now);
-            var IsSet = _cacheDb.StringSet(key , JsonSerializer.Serialize(value), expirayTime);
+            var IsSet = _cacheDb.StringSet(key, JsonConvert.SerializeObject(value), expirayTime);
             return IsSet;
 
         }
