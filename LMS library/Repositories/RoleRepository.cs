@@ -10,6 +10,7 @@ namespace LMS_library.Repositories
         private readonly IMapper _mapper;
         private readonly DataDBContex _contex;
         private readonly ICaching _caching;
+        private readonly string cachingKey = "roles";
 
         public RoleRepository(IMapper mapper, DataDBContex contex ,ICaching caching)
         {
@@ -20,9 +21,10 @@ namespace LMS_library.Repositories
 
         public async Task<string> AddRoleAsync(RoleModel model)
         {
-            var newRole = _mapper.Map<Role>(model);
-            newRole.create_At = DateTime.Now;
-            _contex.Roles.Add(newRole);
+            var newRole = _contex.Roles.Add(_mapper.Map<Role>(model));
+            var expiryTime = DateTimeOffset.Now.AddSeconds(30);
+            _caching.SetData<Role>($"{cachingKey}{model.id}", newRole.Entity, expiryTime);
+            Console.WriteLine("added to cache");
             await _contex.SaveChangesAsync();
             return ("create successfully .");
         }
@@ -31,7 +33,7 @@ namespace LMS_library.Repositories
         {
             var deleteRole = await _contex.Roles!.FindAsync(id);
             if (deleteRole != null)
-            {
+            {   _caching.RemoveData($"{cachingKey}{id}");
                 _contex.Roles.Remove(deleteRole);
                 await _contex.SaveChangesAsync();
             }
@@ -39,7 +41,7 @@ namespace LMS_library.Repositories
 
         public async Task<List<Role>> GetAll()
         {
-            var cacheData = _caching.GetData<IEnumerable<Role>>("roles");
+            var cacheData = _caching.GetData<IEnumerable<Role>>(cachingKey);
             if(cacheData !=null && cacheData.Count() > 0)
             {
                 return cacheData.ToList();
@@ -48,13 +50,18 @@ namespace LMS_library.Repositories
             {
                 cacheData = await _contex.Roles.ToListAsync();
                 var expiryTime = DateTimeOffset.Now.AddSeconds(30);
-                _caching.SetData<IEnumerable<Role>>("roles" , cacheData , expiryTime);
+                _caching.SetData<IEnumerable<Role>>(cachingKey , cacheData , expiryTime);
                 return cacheData.ToList();
             }
         }
 
         public async Task<RoleModel> GetById(int id)//role id
         {
+            var cacheData = _caching.GetData<IEnumerable<Role>>(cachingKey);
+            if(cacheData != null && cacheData.Count() > 0)
+            {
+                return _mapper.Map<RoleModel>(cacheData.FirstOrDefault(c => c.id == id)); 
+            }
             var role = await _contex.Roles!.FindAsync(id);
             return _mapper.Map<RoleModel>(role);
         }
@@ -95,14 +102,20 @@ namespace LMS_library.Repositories
             if (id == model.id)
             {
                 var role = await _contex.Roles!.FindAsync(model.id);
+                var expiryTime = DateTimeOffset.Now.AddSeconds(30);
                 role.name = model.name;
                 role.description = model.description;
                 role.create_At = role.create_At;
                 role.update_At = model.update_At;
-                var updateRole = _mapper.Map<Role>(role);
-                _contex.Roles?.Update(updateRole);
+                var updateRole = _contex.Roles?.Update(_mapper.Map<Role>(role));
+                _caching.SetData($"{cachingKey}{role.id}", updateRole?.Entity , expiryTime);
                 await _contex.SaveChangesAsync();
             }
+        }
+
+        private void CachingFunc()
+        {
+
         }
     }
 }
