@@ -68,18 +68,28 @@ namespace LMS_library.Repositories
 
         public async Task<List<RoleModel>> Filter(string? filter)
         {
+            var cacheData = _caching.GetData<IEnumerable<Role>>(cachingKey);
             var role = _contex.Roles.AsQueryable();
-
-            if (!string.IsNullOrEmpty(filter))
+            if (cacheData != null && cacheData.Count() > 0 && !string.IsNullOrEmpty(filter))
+            {
+                cacheData = cacheData.Where(c => c.name.Contains(filter));
+            }
+            if (cacheData == null && cacheData.Count() <= 0 && !string.IsNullOrEmpty(filter))
             {
                 role = _contex.Roles.Where(u => u.name.Contains(filter));
             }
-            var result = role.Select(u => new RoleModel 
+            var result = cacheData != null ? cacheData.Select(u => new RoleModel 
             {
                 id = u.id,
                 name = u.name,
                 create_At = u.create_At,
                 update_At= u.update_At,
+            }):role.Select(u => new RoleModel
+            {
+                id = u.id,
+                name = u.name,
+                create_At = u.create_At,
+                update_At = u.update_At,
             });
             return result.ToList();
         }
@@ -87,8 +97,6 @@ namespace LMS_library.Repositories
 
         public async Task<string> TestAsyn([FromForm] RoleModel model)
         {
-
-            
                 var newRole = _mapper.Map<Role>(model);
                 newRole.create_At = DateTime.Now;
                 _contex.Roles.Add(newRole);
@@ -113,9 +121,5 @@ namespace LMS_library.Repositories
             }
         }
 
-        private void CachingFunc()
-        {
-
-        }
     }
 }
