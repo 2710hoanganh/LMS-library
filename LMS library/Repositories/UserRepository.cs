@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using LMS_library.Data_Service;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -11,11 +12,14 @@ namespace LMS_library.Repositories
         private IWebHostEnvironment _webHostEnvironment;
         private readonly DataDBContex _contex;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ICaching _caching ;
+        private readonly string cachingKey = "users"; 
 
-        public UserRepository(DataDBContex contex, IMapper mapper, IHttpContextAccessor httpContextAccessor, IWebHostEnvironment webHostEnvironment)
+        public UserRepository(DataDBContex contex, IMapper mapper, IHttpContextAccessor httpContextAccessor, IWebHostEnvironment webHostEnvironment , ICaching caching)
         {
             _contex = contex;
             _mapper = mapper;
+            _caching = caching;
             _httpContextAccessor = httpContextAccessor;
             _webHostEnvironment = webHostEnvironment;
         }
@@ -92,16 +96,30 @@ namespace LMS_library.Repositories
             return result.ToList();
         }
 
-        public async Task<List<User>> GetAll()
+        public async Task<IEnumerable<User>> GetAll()
         {
-            var user = await _contex.Users!.ToListAsync();
-            return _mapper.Map<List<User>>(user);
-
+            var cacheData = _caching.GetData<IEnumerable<User>>(cachingKey);
+            if (cacheData != null && cacheData.Count() > 0)
+            {
+                return _mapper.Map<IEnumerable<User>>(cacheData);
+            }
+            else
+            {
+                cacheData = await _contex.Users!.ToListAsync();
+                var expiryTime = DateTimeOffset.Now.AddSeconds(30);
+                _caching.SetData(cachingKey, cacheData, expiryTime);
+                return _mapper.Map<IEnumerable<User>>(cacheData);
+            }
         }
         public async Task<User> GetById(int id)
         {
-            var user = await _contex.Users!.FindAsync(id);
-            return _mapper.Map<User>(user);
+            var cacheData = _caching.GetData<IEnumerable<User>>(cachingKey);
+            if (cacheData != null && cacheData.Count() > 0) { return _mapper.Map<User>(cacheData.FirstOrDefault(c => c.id == id)); }
+            else
+            {
+                var user = await _contex.Users!.FindAsync(id);
+                return _mapper.Map<User>(user);
+            }
         }
 
         public async Task<List<UserModel>> Search(string? search)

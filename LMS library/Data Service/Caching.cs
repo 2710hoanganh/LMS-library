@@ -12,6 +12,7 @@ namespace LMS_library.Data_Service
             var redis = ConnectionMultiplexer.Connect("localhost:6379");
             _cacheDb = redis.GetDatabase();
         }
+
         public T GetData<T>(string key)
         {
             var value = _cacheDb.StringGet(key);
@@ -40,5 +41,6 @@ namespace LMS_library.Data_Service
             return IsSet;
 
         }
+       
     }
 }

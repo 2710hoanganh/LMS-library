@@ -39,19 +39,19 @@ namespace LMS_library.Repositories
             }
         }
 
-        public async Task<List<Role>> GetAll()
+        public async Task<IEnumerable<Role>> GetAll()
         {
             var cacheData = _caching.GetData<IEnumerable<Role>>(cachingKey);
-            if(cacheData !=null && cacheData.Count() > 0)
+            if (cacheData !=null && cacheData.Count() > 0)
             {
-                return cacheData.ToList();
+                return _mapper.Map<IEnumerable<Role>>(cacheData);
             }
             else
             {
                 cacheData = await _contex.Roles.ToListAsync();
                 var expiryTime = DateTimeOffset.Now.AddSeconds(30);
                 _caching.SetData<IEnumerable<Role>>(cachingKey , cacheData , expiryTime);
-                return cacheData.ToList();
+                return _mapper.Map<IEnumerable<Role>>(cacheData);
             }
         }
 
@@ -66,7 +66,7 @@ namespace LMS_library.Repositories
             return _mapper.Map<RoleModel>(role);
         }
 
-        public async Task<List<RoleModel>> Filter(string? filter)
+        public async Task<IEnumerable<RoleModel>> Filter(string? filter)
         {
             var cacheData = _caching.GetData<IEnumerable<Role>>(cachingKey);
             var role = _contex.Roles.AsQueryable();
@@ -91,7 +91,7 @@ namespace LMS_library.Repositories
                 create_At = u.create_At,
                 update_At = u.update_At,
             });
-            return result.ToList();
+            return _mapper.Map<IEnumerable<RoleModel>>(result);
         }
 
 
